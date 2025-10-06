@@ -14,7 +14,7 @@ TypeScript library providing modular wrappers and utilities for Three.js and oth
 ## Installation
 
 ```bash
-npx degit https://github.com/Jonathan-J8/joeat-utils/dist ./
+npx degit https://github.com/Jonathan-J8/joeat-utils/dist ./your-empty-folder
 ```
 
 ## Quick Start

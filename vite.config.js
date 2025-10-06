@@ -25,7 +25,7 @@ export default defineConfig({
 		},
 	},
 	plugins: [
-		glsl(),
+		glsl({ minify: true, exclude: [/node_modules/, /dist/, /test/], root: './src/shaders' }),
 		dts({
 			// optional tweaks:
 			insertTypesEntry: true,
