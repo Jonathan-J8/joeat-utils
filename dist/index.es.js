@@ -41,18 +41,18 @@ const Te = (s) => {
 }, $e = (s) => {
   const e = s - 1;
   return s < 0.5 ? 16 * s * s * s * s * s : 1 + 16 * e * e * e * e * e;
-}, Be = (s) => s === 0 ? 0 : Math.pow(2, 10 * (s - 1)), qe = (s) => s === 1 ? 1 : -Math.pow(2, -10 * s) + 1, je = (s) => {
+}, Be = (s) => s === 0 ? 0 : Math.pow(2, 10 * (s - 1)), qe = (s) => s === 1 ? 1 : -Math.pow(2, -10 * s) + 1, Ve = (s) => {
   if (s === 0 || s === 1)
     return s;
   const e = s * 2, t = e - 1;
   return e < 1 ? 0.5 * Math.pow(2, 10 * t) : 0.5 * (-Math.pow(2, -10 * t) + 2);
-}, He = (s) => {
+}, je = (s) => {
   const e = s / 1;
   return -1 * (Math.sqrt(1 - e * s) - 1);
-}, Ne = (s) => {
+}, He = (s) => {
   const e = s - 1;
   return Math.sqrt(1 - e * e);
-}, Ve = (s) => {
+}, Ne = (s) => {
   const e = s * 2, t = e - 2;
   return e < 1 ? -0.5 * (Math.sqrt(1 - e * e) - 1) : 0.5 * (Math.sqrt(1 - t * t) + 1);
 }, Xe = (s, e = 1.70158) => s * s * ((e + 1) * s - e), Ye = (s, e = 1.70158) => {
@@ -88,14 +88,14 @@ const Te = (s) => {
     const t = e - 0.9545454545454546;
     return 7.5625 * t * t + 0.984375;
   }
-}, we = (s) => 1 - fe(1 - s), Ze = (s) => s < 0.5 ? we(s * 2) * 0.5 : fe(s * 2 - 1) * 0.5 + 0.5, ne = (s, e, t) => Math.max(e, Math.min(t, s)), _e = (s, e, t) => s >= e - t && s <= e + t, ye = (s, e, t) => (1 - t) * s + t * e, j = (s, e, t, n, o = 1e-4) => s <= e + o && s >= e - o ? s : ye(s, e, 1 - Math.exp(-t * n)), et = (s, e, t, n, o = 1e-4) => {
-  s.x = j(s.x, e.x, t, n, o), s.y = j(s.y, e.y, t, n, o), s.x = j(s.x, e.x, t, n, o), s.y = j(s.y, e.y, t, n, o), typeof s.z == "number" && typeof e.z == "number" && (s.z = j(
+}, we = (s) => 1 - fe(1 - s), Ze = (s) => s < 0.5 ? we(s * 2) * 0.5 : fe(s * 2 - 1) * 0.5 + 0.5, ne = (s, e, t) => Math.max(e, Math.min(t, s)), _e = (s, e, t) => s >= e - t && s <= e + t, ye = (s, e, t) => (1 - t) * s + t * e, V = (s, e, t, n, o = 1e-4) => s <= e + o && s >= e - o ? s : ye(s, e, 1 - Math.exp(-t * n)), et = (s, e, t, n, o = 1e-4) => {
+  s.x = V(s.x, e.x, t, n, o), s.y = V(s.y, e.y, t, n, o), s.x = V(s.x, e.x, t, n, o), s.y = V(s.y, e.y, t, n, o), typeof s.z == "number" && typeof e.z == "number" && (s.z = V(
     s.z,
     e.z,
     t,
     n,
     o
-  )), typeof s.w == "number" && typeof e.w == "number" && (s.w = j(
+  )), typeof s.w == "number" && typeof e.w == "number" && (s.w = V(
     s.w,
     e.w,
     t,
@@ -130,26 +130,26 @@ class me {
   }
 }
 E = new WeakMap();
-const H = (s) => s && s();
-var D, W, N, A, V;
+const j = (s) => s && s();
+var D, W, H, A, N;
 class st extends me {
   constructor() {
     super();
     c(this, D);
     c(this, W, !0);
-    c(this, N, 0);
+    c(this, H, 0);
     c(this, A);
     r(this, "uniforms", Object.freeze({
       uTime: { value: 0 },
       uDeltaTime: { value: 0 },
       uDeltaMs: { value: 0 }
     }));
-    c(this, V, (t) => {
+    c(this, N, (t) => {
       const { uTime: n, uDeltaTime: o, uDeltaMs: u } = this.uniforms;
-      n.value = t, u.value = Math.abs(t - i(this, N)), o.value = u.value * 1e-3, a(this, N, t), super.fire({ time: t, deltaTime: o.value, deltaMs: u.value }), !i(this, A) && a(this, D, requestAnimationFrame(i(this, V)));
+      n.value = t, u.value = Math.abs(t - i(this, H)), o.value = u.value * 1e-3, a(this, H, t), super.fire({ time: t, deltaTime: o.value, deltaMs: u.value }), !i(this, A) && a(this, D, requestAnimationFrame(i(this, N)));
     });
     r(this, "play", (t) => {
-      a(this, A, t), i(this, W) && (a(this, W, !1), a(this, N, ce()), t ? t.setAnimationLoop(i(this, V)) : a(this, D, requestAnimationFrame(i(this, V))));
+      a(this, A, t), i(this, W) && (a(this, W, !1), a(this, H, ce()), t ? t.setAnimationLoop(i(this, N)) : a(this, D, requestAnimationFrame(i(this, N))));
     });
     r(this, "pause", (t) => {
       a(this, W, !0), t ? t.setAnimationLoop(null) : typeof i(this, D) == "number" && cancelAnimationFrame(i(this, D));
@@ -192,13 +192,13 @@ class st extends me {
         const ie = Math.abs(v - l);
         if (t > 0) {
           const he = Math.min(Math.floor(ie / n * t), t - 1);
-          he !== y && (y = he, H(d));
-        } else H(d);
-        ie >= n && (this.removeListener(w), H(d), H(m), g++, (u < 0 || u === 1 / 0 || g < u) && (typeof p == "number" && clearTimeout(p), o > 0 ? p = setTimeout(() => {
-          l = ce(), H(h), this.addListener(w);
+          he !== y && (y = he, j(d));
+        } else j(d);
+        ie >= n && (this.removeListener(w), j(d), j(m), g++, (u < 0 || u === 1 / 0 || g < u) && (typeof p == "number" && clearTimeout(p), o > 0 ? p = setTimeout(() => {
+          l = ce(), j(h), this.addListener(w);
         }, o) : M()));
       }, M = () => {
-        l = ce(), H(h), this.addListener(w);
+        l = ce(), j(h), this.addListener(w);
       };
       return typeof p == "number" && clearTimeout(p), o > 0 ? p = setTimeout(M, o) : M(), () => this.removeListener(w);
     });
@@ -207,7 +207,7 @@ class st extends me {
     return i(this, W);
   }
 }
-D = new WeakMap(), W = new WeakMap(), N = new WeakMap(), A = new WeakMap(), V = new WeakMap();
+D = new WeakMap(), W = new WeakMap(), H = new WeakMap(), A = new WeakMap(), N = new WeakMap();
 class it {
   constructor({
     camera: e,
@@ -322,7 +322,6 @@ class nt {
       a(this, L, document.createElement("div")), i(this, L).style.padding = "3px", e.domElement.appendChild(i(this, L));
     });
     this.uniforms = Object.freeze({
-      uElementSize: { value: new n() },
       uScroll: { value: new n() },
       uScrollVelocity: { value: new n() },
       uMousePress: { value: 0 },
@@ -577,20 +576,20 @@ export {
   Te as clickout,
   Ee as createDebugTexture,
   be as createEmpytTexture,
-  j as dampThreshold,
+  V as dampThreshold,
   et as dampThresholdVec,
   Xe as easeInBack,
   we as easeInBounce,
-  He as easeInCirc,
+  je as easeInCirc,
   Fe as easeInCubic,
   Ue as easeInElastic,
   Be as easeInExpo,
   Ge as easeInOutBack,
   Ze as easeInOutBounce,
-  Ve as easeInOutCirc,
+  Ne as easeInOutCirc,
   ke as easeInOutCubic,
   Ke as easeInOutElastic,
-  je as easeInOutExpo,
+  Ve as easeInOutExpo,
   Oe as easeInOutQuad,
   Ae as easeInOutQuart,
   $e as easeInOutQuint,
@@ -601,7 +600,7 @@ export {
   ze as easeInSine,
   Ye as easeOutBack,
   fe as easeOutBounce,
-  Ne as easeOutCirc,
+  He as easeOutCirc,
   Ce as easeOutCubic,
   Je as easeOutElastic,
   qe as easeOutExpo,
