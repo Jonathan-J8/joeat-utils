@@ -1,4 +1,4 @@
-import { Spring } from 'joeat';
+import { Spring } from 'joeat-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('Spring', () => {

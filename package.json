@@ -31,7 +31,7 @@
 	},
 	"main": "dist/index.cjs.js",
 	"module": "dist/index.es.js",
-	"name": "joeat",
+	"name": "joeat-utils",
 	"private": true,
 	"scripts": {
 		"build": "NODE_ENV=production tsc && vite build",

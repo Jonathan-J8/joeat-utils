@@ -1,4 +1,4 @@
-import { SceneWrapper } from 'joeat';
+import { SceneWrapper } from 'joeat-utils';
 import type * as Three from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

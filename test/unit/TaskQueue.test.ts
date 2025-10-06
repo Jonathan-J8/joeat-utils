@@ -1,4 +1,4 @@
-import { TaskQueue } from 'joeat';
+import { TaskQueue } from 'joeat-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Helper to create async task with delay

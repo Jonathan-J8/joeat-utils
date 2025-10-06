@@ -1,4 +1,4 @@
-import { CameraWrapper } from 'joeat';
+import { CameraWrapper } from 'joeat-utils';
 import type * as Three from 'three';
 import type { OrbitControls } from 'three/examples/jsm/Addons.js';
 import type { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';

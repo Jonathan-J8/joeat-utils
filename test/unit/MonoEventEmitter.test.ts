@@ -1,4 +1,4 @@
-import { MonoEventEmitter } from 'joeat';
+import { MonoEventEmitter } from 'joeat-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('MonoEventEmitter', () => {

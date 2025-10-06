@@ -1,4 +1,4 @@
-import { MousePointer } from 'joeat';
+import { MousePointer } from 'joeat-utils';
 import type * as Three from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { Resizer } from 'joeat';
+import { Resizer } from 'joeat-utils';
 import { JSDOM } from 'jsdom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

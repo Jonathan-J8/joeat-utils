@@ -1,4 +1,4 @@
-import { Animator, TaskQueue } from '../../../src';
+import { Animator, TaskQueue } from 'joeat-utils';
 
 const animator = new Animator();
 

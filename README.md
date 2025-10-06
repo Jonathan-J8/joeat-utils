@@ -20,7 +20,7 @@ npx degit https://github.com/Jonathan-J8/joeat-utils/dist ./your-empty-folder
 ## Quick Start
 
 ```typescript
-import { Animator, RendererWrapper, MousePointer } from 'joeat';
+import { Animator, RendererWrapper, MousePointer } from 'joeat-utils';
 import * as THREE from 'three';
 
 // Create renderer with post-processing support

@@ -1,9 +1,9 @@
-import { RendererWrapper } from 'joeat';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { RendererWrapper } from 'joeat-utils';
 import type * as Three from 'three';
 import type { Pass } from 'three/addons/postprocessing/Pass.js';
 import type { EffectComposer } from 'three/examples/jsm/Addons.js';
 import type { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('RendererWrapper', () => {
 	// Mock Vector2
