@@ -1,5 +1,5 @@
 const clickout = (node: Node) => {
-	const handleClickOut = (event: PointerEvent) => {
+	const handleClickOut = (event: MouseEvent | TouchEvent) => {
 		const target = event.target as HTMLElement;
 		if (node && !node.contains(target) && !event.defaultPrevented) {
 			node.dispatchEvent(new CustomEvent('clickout', { detail: { node } }));

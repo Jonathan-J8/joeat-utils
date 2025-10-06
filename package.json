@@ -41,7 +41,7 @@
 		"format": "prettier --write .",
 		"unit": "vitest run ./test/unit ",
 		"integration": "vitest ./test/integration",
-		"test": "vitest"
+		"test": "vitest run"
 	},
 	"type": "module",
 	"types": "dist/index.d.ts",

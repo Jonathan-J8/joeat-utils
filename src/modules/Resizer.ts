@@ -1,5 +1,5 @@
 import type { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
-import clamp from '../utils/clamp';
+import { clamp } from '../utils';
 import MonoEventEmitter from './MonoEventEmitter';
 
 class Resizer extends MonoEventEmitter<[{ width: number; height: number; pixelRatio: number }]> {

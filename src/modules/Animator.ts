@@ -1,7 +1,6 @@
 import type { WebGLRenderer } from 'three';
 import type { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
-import clamp from '../utils/clamp';
-import now from '../utils/now';
+import { clamp, now } from '../utils';
 import MonoEventEmitter from './MonoEventEmitter';
 
 const execute = (fn?: () => void) => fn && fn();
