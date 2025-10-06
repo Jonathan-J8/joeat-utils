@@ -40,7 +40,6 @@
 		"lint": "prettier --check . && eslint .",
 		"format": "prettier --write .",
 		"unit": "vitest run ./test/unit ",
-		"integration": "vitest ./test/integration",
 		"test": "vitest run"
 	},
 	"type": "module",

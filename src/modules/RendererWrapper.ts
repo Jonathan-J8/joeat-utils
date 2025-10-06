@@ -56,9 +56,10 @@ export default class GlRendererWrapper {
 	resize = (o: { width: number; height: number; pixelRatio: number }) => {
 		const { width, height, pixelRatio } = o;
 		if (!this.instance) return;
+
 		this.instance.setSize(width, height, false);
-		this.uniforms.uResolution.value.set(width, height);
 		this.instance.setPixelRatio(pixelRatio);
+		this.uniforms.uResolution.value.set(width, height);
 		if (this.composer) this.composer.setSize(width, height);
 	};
 

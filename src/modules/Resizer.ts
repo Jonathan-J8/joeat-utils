@@ -3,9 +3,9 @@ import { clamp } from '../utils';
 import MonoEventEmitter from './MonoEventEmitter';
 
 class Resizer extends MonoEventEmitter<[{ width: number; height: number; pixelRatio: number }]> {
-	#maxSize = 7680;
-	#width = 100;
-	#height = 100;
+	#maxSize = 7680; // 4k
+	#width = 1280;
+	#height = 720;
 	#pixelRatio = 1;
 	#resolutionFactor = 1;
 	#element: HTMLElement;
@@ -39,7 +39,7 @@ class Resizer extends MonoEventEmitter<[{ width: number; height: number; pixelRa
 	}
 
 	set resolutionFactor(n: number) {
-		this.#resolutionFactor = clamp(n, 0.01, 1);
+		this.#resolutionFactor = clamp(n, 0.001, 1);
 		this.fire();
 	}
 
@@ -51,9 +51,7 @@ class Resizer extends MonoEventEmitter<[{ width: number; height: number; pixelRa
 	fire = () => {
 		let width = this.#width;
 		let height = this.#height;
-		const pixelRatio = this.#pixelRatio;
 
-		// if (this.#maxSize !== Infinity) {
 		if (this.#width > this.#maxSize || this.#height > this.#maxSize) {
 			if (width > height) {
 				const ratio = height / width;
@@ -69,12 +67,14 @@ class Resizer extends MonoEventEmitter<[{ width: number; height: number; pixelRa
 		width *= this.#resolutionFactor;
 		height *= this.#resolutionFactor;
 
+		const pixelRatio = this.#pixelRatio;
 		super.fire({ width, height, pixelRatio });
 	};
 
 	#observer = new ResizeObserver((entries) => {
 		const box = entries[0].contentBoxSize[0];
 		const { inlineSize: width, blockSize: height } = box;
+
 		if (this.#width === width && this.#height === height) return; // no need to resize
 
 		this.#width = width;
@@ -89,10 +89,18 @@ class Resizer extends MonoEventEmitter<[{ width: number; height: number; pixelRa
 	}
 
 	debug = (gui: GUI) => {
-		gui.add({ maxSize: this.maxSize }, 'maxSize', 0, 7680).name('max resolution');
+		gui
+			.add({ maxSize: this.maxSize }, 'maxSize', 0, 7680)
+			.name('max resolution')
+			.onChange((v: number) => {
+				this.maxSize = v;
+			});
 		gui
 			.add({ resolutionFactor: this.resolutionFactor }, 'resolutionFactor', 0.0, 1)
-			.name('resolution factor');
+			.name('resolution factor')
+			.onChange((v: number) => {
+				this.resolutionFactor = v;
+			});
 	};
 }
 

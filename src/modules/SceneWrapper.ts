@@ -33,7 +33,7 @@ export default class CustomScene {
 		mesh.children.forEach((child: unknown) => this.disposeNode(child));
 	};
 
-	dispose = () => {
+	clear = () => {
 		this.instance.children.forEach((child) => CustomScene.disposeNode(child));
 		this.instance.clear();
 	};

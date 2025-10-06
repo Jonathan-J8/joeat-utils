@@ -1,93 +1,35 @@
-import { Animator, TaskQueue } from 'joeat-utils';
+import { BoxGeometry, Mesh, type Material } from 'three';
 
-const animator = new Animator();
+import './mouse';
+import './style.css';
+import useThreeWrapper from './useThreeWrapper';
 
-{
-	const from = 0;
-	const to = 1;
-	animator.interpolate({
-		from,
-		to,
-		onStart: ({ value, time, deltaTime }) => {
-			console.assert(typeof value === 'number');
-			console.assert(typeof time === 'number');
-			console.assert(typeof deltaTime === 'number');
-			console.assert(value === from);
-		},
-		onUpdate: ({ value }) => {
-			console.assert(value >= from && value <= to);
-		},
-		onComplete: ({ value }) => {
-			console.assert(value === to);
-		},
+const { scene, animator } = useThreeWrapper();
+const cube = new Mesh(new BoxGeometry(2, 2, 2));
+scene.instance.add(cube);
+
+animator.addListener(() => {
+	cube.rotation.x += 0.01;
+	cube.rotation.y += 0.01;
+});
+
+const debugBtn = document.getElementById('debug-btn') as HTMLButtonElement;
+const click = () => {
+	if (location.hash === '#debug') {
+		location.hash = '';
+		debugBtn.textContent = 'Debug';
+	} else {
+		location.hash = '#debug';
+		debugBtn.textContent = 'Close Debug';
+	}
+};
+click();
+debugBtn.addEventListener('click', click);
+
+if (import.meta.hot) {
+	import.meta.hot.dispose(() => {
+		debugBtn.removeEventListener('click', click);
+		cube.geometry.dispose();
+		(cube.material as Material).dispose();
 	});
 }
-{
-	const from = 0;
-	const to = -1;
-	animator.interpolate({
-		from,
-		to,
-		onStart: ({ value, time, deltaTime }) => {
-			console.assert(typeof value === 'number');
-			console.assert(typeof time === 'number');
-			console.assert(typeof deltaTime === 'number');
-			console.assert(value === from);
-		},
-		onUpdate: ({ value }) => {
-			console.assert(value <= from && value >= to);
-		},
-		onComplete: ({ value }) => {
-			console.assert(value === to);
-		},
-	});
-}
-
-animator.play();
-
-{
-	const taskQueue = new TaskQueue();
-
-	taskQueue.add(
-		() => {
-			console.assert(taskQueue.size === 2);
-			taskQueue.stop(); // Stop the queue after this task
-
-			setTimeout(() => {
-				taskQueue.play(); // Resume the queue after 1 second
-			}, 1000);
-		},
-		() => {
-			console.assert(taskQueue.size === 1);
-			return new Promise<void>((resolve) => {
-				setTimeout(() => {
-					console.assert(taskQueue.size === 1);
-					resolve();
-				}, 1000);
-			});
-		},
-		() => {
-			console.assert(taskQueue.size === 0);
-		},
-	);
-	taskQueue.play();
-}
-(async () => {
-	const taskQueue = new TaskQueue();
-
-	const res: string[] = [];
-	taskQueue.add(
-		() => {
-			res.push('first');
-		},
-		() => {
-			res.push('second');
-		},
-		() => {
-			res.push('third');
-		},
-	);
-	await taskQueue.play();
-
-	console.assert(JSON.stringify(res) === JSON.stringify(['first', 'second', 'third']));
-})();

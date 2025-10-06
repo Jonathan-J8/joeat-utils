@@ -40,12 +40,9 @@ export default class CameraWrapper {
 
 	resize = ({ width, height }: { width: number; height: number }) => {
 		const { instance } = this;
-		// if (Object.hasOwn(instance, 'aspect')) instance.aspect = width / height;
-
 		if ((instance as Three.PerspectiveCamera)?.aspect)
 			(instance as Three.PerspectiveCamera).aspect = width / height;
 
-		// if (instance?.isPerspectiveCamera) instance.aspect = width / height;
 		// if(instance instanceof Three.OrthographicCamera) {
 		// 	const frustumHeight = instance.top - instance.bottom;
 		// 	instance.left = (frustumHeight * width) / height / -2;

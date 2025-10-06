@@ -1,7 +1,7 @@
 import type * as Three from 'three';
+import type GUI from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
 type Uniforms = {
-	uElementSize: { value: Three.Vector2 };
 	uScroll: { value: Three.Vector2 };
 	uScrollVelocity: { value: Three.Vector2 };
 	uMousePress: { value: number };
@@ -12,7 +12,6 @@ type Uniforms = {
 
 class MousePointer {
 	uniforms: Uniforms;
-
 	#origin: Three.Vector3;
 	#plane: Three.Plane;
 	#raycaster: Three.Raycaster;
@@ -21,6 +20,7 @@ class MousePointer {
 	#timeoutId: ReturnType<typeof setTimeout> | undefined;
 	#camera: Three.Camera;
 	#cameraDirection: Three.Vector3;
+	#ui: HTMLElement | undefined;
 
 	constructor({
 		Plane,
@@ -52,60 +52,54 @@ class MousePointer {
 		this.#previousPosition = new Vector2();
 		this.#camera = camera;
 		this.#cameraDirection = new Vector3();
-
-		// window.addEventListener('pointermove', pointermove, false);
-		// window.addEventListener('pointerdown', updateMousePress, false);
-		// window.addEventListener('pointerup', updateMousePress, false);
-		// window.addEventListener('pointerout', updateMousePress, false);
-		// window.addEventListener('scroll', updateScroll, false);
-		// window.addEventListener('scrollend', updateScroll, false);
-
-		// const dispose = () => {
-		// 	window.removeEventListener('pointermove', pointermove, false);
-		// 	window.removeEventListener('pointerdown', updateMousePress, false);
-		// 	window.removeEventListener('pointerup', updateMousePress, false);
-		// 	window.removeEventListener('pointerout', updateMousePress, false);
-		// 	window.removeEventListener('scroll', updateScroll, false);
-		// 	window.removeEventListener('scrollend', updateScroll, false);
-		// };
 	}
 
-	#updateScroll = (e: Event) => {
-		const { uScroll, uScrollVelocity } = this.uniforms;
-		this.#previousScroll.copy(uScroll.value);
-		const x = window.scrollX / (document.body.scrollWidth - window.innerWidth);
-		const y = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+	#updateUI = () => {
+		if (!this.#ui) return;
 
-		uScroll.value.x = x;
-		uScroll.value.y = y;
-
-		if (e.type === 'scroll') uScrollVelocity.value.subVectors(uScroll.value, this.#previousScroll);
-		else uScrollVelocity.value.set(0, 0);
+		this.#ui.innerHTML = `
+			<p>Mouse position x ${this.uniforms.uMousePosition.value.x.toFixed(2)} y ${this.uniforms.uMousePosition.value.y.toFixed(2)}</p>
+			<p>Mouse world position x ${this.uniforms.uMouseWorldPosition.value.x.toFixed(2)} y ${this.uniforms.uMouseWorldPosition.value.y.toFixed(2)} z ${this.uniforms.uMouseWorldPosition.value.z.toFixed(2)}</p>
+			<p>Mouse velocity x ${this.uniforms.uMouseVelocity.value.x.toFixed(2)} y ${this.uniforms.uMouseVelocity.value.y.toFixed(2)}</p>
+			<p>Mouse press ${this.uniforms.uMousePress.value}</p>
+			<p>Scroll x ${this.uniforms.uScroll.value.x.toFixed(2)} y ${this.uniforms.uScroll.value.y.toFixed(2)}</p>
+		
+		`;
 	};
 
-	#updateMousePosition = (event: PointerEvent) => {
-		const { uMousePosition, uElementSize } = this.uniforms;
-		const w = uElementSize.value.x;
-		const h = uElementSize.value.y;
+	#updateMousePosition = (e: Event) => {
+		const event = e as PointerEvent;
+		const element = event.target;
+		let w = 0;
+		let h = 0;
+
+		if (element instanceof HTMLCanvasElement) {
+			w = element.width;
+			h = element.height;
+		} else if (element instanceof HTMLElement) {
+			const { width, height } = element.getBoundingClientRect();
+			w = width;
+			h = height;
+		} else {
+			w = window.innerWidth;
+			h = window.innerHeight;
+		}
+
+		const { uMousePosition } = this.uniforms;
+
 		uMousePosition.value.x = (event.clientX / w) * 2 - 1;
 		uMousePosition.value.y = -(event.clientY / h) * 2 + 1;
 	};
 
-	#updateMousePress = (e: PointerEvent) => {
-		const { uMousePress } = this.uniforms;
-		const isMouse = e.pointerType === 'mouse';
-		if (isMouse) uMousePress.value = e.pressure ? 1 : 0;
-		else uMousePress.value = e.pressure;
-	};
-
-	#updateMouseVelocity = (event: PointerEvent) => {
+	#updateMouseVelocity = (e: Event) => {
+		const event = e as PointerEvent;
 		const { uMouseVelocity } = this.uniforms;
 		const x = event.pageX;
 		const y = event.pageY;
 		const px = this.#previousPosition.x;
 		const py = this.#previousPosition.y;
-		uMouseVelocity.value.x = Math.abs(x - px) * 0.16; // approximation of deltaTime 60fps
-		uMouseVelocity.value.y = Math.abs(y - py) * 0.16;
+		uMouseVelocity.value.x = Math.abs(x - px);
+		uMouseVelocity.value.y = Math.abs(y - py);
 		this.#previousPosition.set(x, y);
 
 		if (typeof this.#timeoutId === 'number') clearTimeout(this.#timeoutId);
@@ -122,26 +116,58 @@ class MousePointer {
 		this.#raycaster.ray.intersectPlane(this.#plane, uMouseWorldPosition.value);
 	};
 
-	// canvas or window resize
-	onResize = ({ width, height }: { width: number; height: number }) => {
-		this.uniforms.uElementSize.value.set(width, height);
-	};
-
-	// pointer move
-	onMove = (e: PointerEvent) => {
+	#updateMouseMove = (e: Event) => {
 		this.#updateMousePosition(e);
 		this.#updateMouseWorldPosition();
 		this.#updateMouseVelocity(e);
+		this.#updateUI();
 	};
 
-	// pointer down / up / out
-	onPress = (e: PointerEvent) => {
-		this.#updateMousePress(e);
+	#updateScroll = (e: Event) => {
+		const { uScroll, uScrollVelocity } = this.uniforms;
+		this.#previousScroll.copy(uScroll.value);
+		const x = window.scrollX / (document.body.scrollWidth - window.innerWidth);
+		const y = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+
+		uScroll.value.x = x;
+		uScroll.value.y = y;
+
+		if (e.type === 'scroll') uScrollVelocity.value.subVectors(uScroll.value, this.#previousScroll);
+		else uScrollVelocity.value.set(0, 0);
+		this.#updateUI();
 	};
 
-	// scroll / scroll end
-	onScroll = (e: Event) => {
-		this.#updateScroll(e);
+	#updateMousePress = (e: Event) => {
+		const event = e as PointerEvent;
+		const { uMousePress } = this.uniforms;
+		const isMouse = event.pointerType === 'mouse';
+		if (isMouse) uMousePress.value = event.pressure ? 1 : 0;
+		else uMousePress.value = event.pressure;
+		this.#updateUI();
+	};
+
+	init = (element: HTMLElement | Document | Window) => {
+		element.addEventListener('pointermove', this.#updateMouseMove, false);
+		element.addEventListener('pointerout', this.#updateMouseMove, false);
+		element.addEventListener('pointerdown', this.#updateMousePress, false);
+		element.addEventListener('pointerup', this.#updateMousePress, false);
+		window.addEventListener('scroll', this.#updateScroll, false);
+		window.addEventListener('scrollend', this.#updateScroll, false);
+	};
+
+	clear = (element: HTMLElement | Document | Window) => {
+		element.removeEventListener('pointermove', this.#updateMouseMove, false);
+		element.removeEventListener('pointerout', this.#updateMouseMove, false);
+		element.removeEventListener('pointerdown', this.#updateMousePress, false);
+		element.removeEventListener('pointerup', this.#updateMousePress, false);
+		window.removeEventListener('scroll', this.#updateScroll, false);
+		window.removeEventListener('scrollend', this.#updateScroll, false);
+	};
+
+	debug = (gui: GUI) => {
+		this.#ui = document.createElement('div');
+		this.#ui.style.padding = '3px';
+		gui.domElement.appendChild(this.#ui);
 	};
 }
 
