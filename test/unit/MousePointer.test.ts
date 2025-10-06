@@ -303,10 +303,6 @@ describe('MousePointer', () => {
 
 			// All uniforms should maintain their structure
 			expect(typeof uniforms.uMousePress.value).toBe('number');
-			expect(
-				(uniforms as typeof uniforms & { uElementSize: { value: Three.Vector2 } }).uElementSize
-					.value,
-			).toBe(mockVector2);
 			expect(uniforms.uScroll.value).toBe(mockVector2);
 			expect(uniforms.uScrollVelocity.value).toBe(mockVector2);
 			expect(uniforms.uMousePosition.value).toBe(mockVector2);

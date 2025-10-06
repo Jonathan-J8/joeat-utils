@@ -1,5 +1,5 @@
-echo "⚙️ Running build before staging..." 
-&& npm run build 
-&& git add dist 
-&& npm run lint 
+echo "⚙️ Running build before staging..." \
+&& npm run build \
+&& git add dist \
+&& npm run lint \
 && npm run test
