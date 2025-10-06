@@ -6,6 +6,6 @@ export default class CustomScene {
     });
     private static disposeMaterial;
     private static disposeNode;
-    dispose: () => void;
+    clear: () => void;
 }
 //# sourceMappingURL=SceneWrapper.d.ts.map

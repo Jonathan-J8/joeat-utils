@@ -44,23 +44,23 @@ describe('SceneWrapper', () => {
 
 	describe('dispose method', () => {
 		it('should dispose geometry of meshes', () => {
-			sceneWrapper.dispose();
+			sceneWrapper.clear();
 			expect(mockGeometry.dispose).toHaveBeenCalled();
 		});
 
 		it('should dispose materials of meshes', () => {
-			sceneWrapper.dispose();
+			sceneWrapper.clear();
 			expect(mockMaterial.dispose).toHaveBeenCalled();
 		});
 
 		it('should dispose material properties that have dispose method', () => {
-			sceneWrapper.dispose();
+			sceneWrapper.clear();
 			expect(mockMaterial.map.dispose).toHaveBeenCalled();
 			expect(mockMaterial.normalMap.dispose).toHaveBeenCalled();
 		});
 
 		it('should clear the scene', () => {
-			sceneWrapper.dispose();
+			sceneWrapper.clear();
 			expect(mockScene.clear).toHaveBeenCalled();
 		});
 
@@ -82,7 +82,7 @@ describe('SceneWrapper', () => {
 			} as unknown as Three.Scene;
 
 			const wrapper = new SceneWrapper({ scene: sceneWithArray });
-			wrapper.dispose();
+			wrapper.clear();
 
 			materialArray.forEach((mat) => {
 				expect(mat.dispose).toHaveBeenCalled();
@@ -108,7 +108,7 @@ describe('SceneWrapper', () => {
 			} as unknown as Three.Scene;
 
 			const wrapper = new SceneWrapper({ scene: sceneWithNested });
-			wrapper.dispose();
+			wrapper.clear();
 
 			expect(parentMesh.geometry.dispose).toHaveBeenCalled();
 			expect((parentMesh.material as Three.Material).dispose).toHaveBeenCalled();
@@ -128,7 +128,7 @@ describe('SceneWrapper', () => {
 
 			const wrapper = new SceneWrapper({ scene: sceneWithEmpty });
 
-			expect(() => wrapper.dispose()).not.toThrow();
+			expect(() => wrapper.clear()).not.toThrow();
 			expect(sceneWithEmpty.clear).toHaveBeenCalled();
 		});
 
@@ -140,7 +140,7 @@ describe('SceneWrapper', () => {
 
 			const wrapper = new SceneWrapper({ scene: sceneWithNulls });
 
-			expect(() => wrapper.dispose()).not.toThrow();
+			expect(() => wrapper.clear()).not.toThrow();
 		});
 
 		it('should handle materials without disposable properties', () => {
@@ -161,7 +161,7 @@ describe('SceneWrapper', () => {
 			} as unknown as Three.Scene;
 
 			const wrapper = new SceneWrapper({ scene: sceneWithSimple });
-			wrapper.dispose();
+			wrapper.clear();
 
 			expect(simpleMaterial.dispose).toHaveBeenCalled();
 		});
@@ -190,7 +190,7 @@ describe('SceneWrapper', () => {
 			} as unknown as Three.Scene;
 
 			const wrapper = new SceneWrapper({ scene });
-			wrapper.dispose();
+			wrapper.clear();
 
 			expect(material.map.dispose).toHaveBeenCalled();
 			expect(material.dispose).toHaveBeenCalled();
@@ -198,7 +198,7 @@ describe('SceneWrapper', () => {
 
 		it('should have disposeNode as private static method', () => {
 			// Test indirectly through dispose functionality
-			expect(() => sceneWrapper.dispose()).not.toThrow();
+			expect(() => sceneWrapper.clear()).not.toThrow();
 		});
 	});
 
@@ -223,7 +223,7 @@ describe('SceneWrapper', () => {
 
 			const wrapper = new SceneWrapper({ scene: emptyScene });
 
-			expect(() => wrapper.dispose()).not.toThrow();
+			expect(() => wrapper.clear()).not.toThrow();
 			expect(emptyScene.clear).toHaveBeenCalled();
 		});
 
@@ -252,7 +252,7 @@ describe('SceneWrapper', () => {
 			} as unknown as Three.Scene;
 
 			const wrapper = new SceneWrapper({ scene: deepScene });
-			wrapper.dispose();
+			wrapper.clear();
 
 			expect(level1.geometry.dispose).toHaveBeenCalled();
 			expect(level2.geometry.dispose).toHaveBeenCalled();

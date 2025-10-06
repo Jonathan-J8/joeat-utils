@@ -36,7 +36,6 @@ class MousePointer {
 		camera: Three.Camera;
 	}) {
 		this.uniforms = Object.freeze({
-			uElementSize: { value: new Vector2() },
 			uScroll: { value: new Vector2() },
 			uScrollVelocity: { value: new Vector2() },
 			uMousePress: { value: 0 },

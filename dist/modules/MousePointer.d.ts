@@ -1,8 +1,6 @@
+import { default as GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import type * as Three from 'three';
 type Uniforms = {
-    uElementSize: {
-        value: Three.Vector2;
-    };
     uScroll: {
         value: Three.Vector2;
     };
@@ -32,13 +30,9 @@ declare class MousePointer {
         Raycaster: typeof Three.Raycaster;
         camera: Three.Camera;
     });
-    onResize: ({ width, height }: {
-        width: number;
-        height: number;
-    }) => void;
-    onMove: (e: PointerEvent) => void;
-    onPress: (e: PointerEvent) => void;
-    onScroll: (e: Event) => void;
+    init: (element: HTMLElement | Document | Window) => void;
+    clear: (element: HTMLElement | Document | Window) => void;
+    debug: (gui: GUI) => void;
 }
 export default MousePointer;
 //# sourceMappingURL=MousePointer.d.ts.map

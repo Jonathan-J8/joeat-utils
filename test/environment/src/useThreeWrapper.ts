@@ -40,7 +40,7 @@ const debug = () => {
 debug();
 window.addEventListener('hashchange', debug);
 
-if (import.meta.hot) {
+if (import.meta?.hot) {
 	import.meta.hot.dispose(() => {
 		window.removeEventListener('hashchange', debug);
 		gui.destroy();

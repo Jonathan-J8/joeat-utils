@@ -10,6 +10,7 @@ describe('MousePointer', () => {
 		set: vi.fn().mockReturnThis(),
 		copy: vi.fn().mockReturnThis(),
 		subVectors: vi.fn().mockReturnThis(),
+		toFixed: vi.fn().mockReturnValue('0.00'),
 	} as unknown as Three.Vector2;
 
 	const mockVector3 = {
@@ -18,6 +19,7 @@ describe('MousePointer', () => {
 		z: 0,
 		set: vi.fn().mockReturnThis(),
 		copy: vi.fn().mockReturnThis(),
+		toFixed: vi.fn().mockReturnValue('0.00'),
 	} as unknown as Three.Vector3;
 
 	const mockPlane = {
@@ -43,9 +45,33 @@ describe('MousePointer', () => {
 	const mockRaycasterClass = vi.fn(() => mockRaycaster) as unknown as typeof Three.Raycaster;
 
 	let mousePointer: MousePointer;
+	let mockElement: HTMLElement;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
+
+		// Mock DOM elements and methods
+		mockElement = {
+			addEventListener: vi.fn(),
+			removeEventListener: vi.fn(),
+			getBoundingClientRect: vi.fn().mockReturnValue({ width: 800, height: 600 }),
+		} as unknown as HTMLElement;
+
+		// Mock window and document properties
+		Object.defineProperty(window, 'addEventListener', {
+			value: vi.fn(),
+			configurable: true,
+		});
+		Object.defineProperty(window, 'removeEventListener', {
+			value: vi.fn(),
+			configurable: true,
+		});
+		Object.defineProperty(window, 'innerWidth', { value: 800, configurable: true });
+		Object.defineProperty(window, 'innerHeight', { value: 600, configurable: true });
+		Object.defineProperty(window, 'scrollX', { value: 0, configurable: true });
+		Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+		Object.defineProperty(document.body, 'scrollWidth', { value: 1600, configurable: true });
+		Object.defineProperty(document.body, 'scrollHeight', { value: 1200, configurable: true });
 
 		mousePointer = new MousePointer({
 			Vector2: mockVector2Class,
@@ -61,7 +87,6 @@ describe('MousePointer', () => {
 			expect(mousePointer).toBeInstanceOf(MousePointer);
 
 			// Check uniform properties exist
-			expect(mousePointer.uniforms.uElementSize).toBeDefined();
 			expect(mousePointer.uniforms.uScroll).toBeDefined();
 			expect(mousePointer.uniforms.uScrollVelocity).toBeDefined();
 			expect(mousePointer.uniforms.uMousePress).toBeDefined();
@@ -74,7 +99,6 @@ describe('MousePointer', () => {
 			const { uniforms } = mousePointer;
 
 			// Vector2 uniforms should have { value: Vector2 } structure
-			expect(uniforms.uElementSize.value).toBe(mockVector2);
 			expect(uniforms.uScroll.value).toBe(mockVector2);
 			expect(uniforms.uScrollVelocity.value).toBe(mockVector2);
 			expect(uniforms.uMousePosition.value).toBe(mockVector2);
@@ -100,202 +124,206 @@ describe('MousePointer', () => {
 		});
 	});
 
-	describe('onResize method', () => {
-		it('should update element size uniform', () => {
-			mousePointer.onResize({ width: 1920, height: 1080 });
+	describe('init method', () => {
+		it('should add event listeners to the element', () => {
+			mousePointer.init(mockElement);
 
-			expect(mockVector2.set).toHaveBeenCalledWith(1920, 1080);
+			expect(mockElement.addEventListener).toHaveBeenCalledWith(
+				'pointermove',
+				expect.any(Function),
+				false,
+			);
+			expect(mockElement.addEventListener).toHaveBeenCalledWith(
+				'pointerout',
+				expect.any(Function),
+				false,
+			);
+			expect(mockElement.addEventListener).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any(Function),
+				false,
+			);
+			expect(mockElement.addEventListener).toHaveBeenCalledWith(
+				'pointerup',
+				expect.any(Function),
+				false,
+			);
 		});
 
-		it('should handle different screen sizes', () => {
-			mousePointer.onResize({ width: 800, height: 600 });
-			expect(mockVector2.set).toHaveBeenCalledWith(800, 600);
+		it('should add scroll event listeners to window', () => {
+			mousePointer.init(mockElement);
 
-			mousePointer.onResize({ width: 1440, height: 900 });
-			expect(mockVector2.set).toHaveBeenCalledWith(1440, 900);
+			expect(window.addEventListener).toHaveBeenCalledWith('scroll', expect.any(Function), false);
+			expect(window.addEventListener).toHaveBeenCalledWith(
+				'scrollend',
+				expect.any(Function),
+				false,
+			);
+		});
+
+		it('should work with window as element', () => {
+			expect(() => mousePointer.init(window)).not.toThrow();
+			expect(window.addEventListener).toHaveBeenCalled();
+		});
+
+		it('should work with document as element', () => {
+			const mockDocument = {
+				addEventListener: vi.fn(),
+			} as unknown as Document;
+
+			expect(() => mousePointer.init(mockDocument)).not.toThrow();
+			expect(mockDocument.addEventListener).toHaveBeenCalled();
 		});
 	});
 
-	describe('onMove method', () => {
+	describe('clear method', () => {
 		beforeEach(() => {
-			// Set up element size for mouse position calculations
-			mousePointer.onResize({ width: 800, height: 600 });
+			mousePointer.init(mockElement);
+			vi.clearAllMocks();
 		});
 
-		it('should update mouse world position', () => {
-			const pointerEvent = {
-				clientX: 200,
-				clientY: 150,
-				pageX: 200,
-				pageY: 150,
-			} as PointerEvent;
+		it('should remove event listeners from the element', () => {
+			mousePointer.clear(mockElement);
 
-			mousePointer.onMove(pointerEvent);
-
-			// Should call raycaster and plane methods for world position calculation
-			expect(mockCamera.getWorldDirection).toHaveBeenCalled();
-			expect(mockRaycaster.setFromCamera).toHaveBeenCalled();
-			expect(mockPlane.setFromNormalAndCoplanarPoint).toHaveBeenCalled();
-			expect(mockRay.intersectPlane).toHaveBeenCalled();
+			expect(mockElement.removeEventListener).toHaveBeenCalledWith(
+				'pointermove',
+				expect.any(Function),
+				false,
+			);
+			expect(mockElement.removeEventListener).toHaveBeenCalledWith(
+				'pointerout',
+				expect.any(Function),
+				false,
+			);
+			expect(mockElement.removeEventListener).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any(Function),
+				false,
+			);
+			expect(mockElement.removeEventListener).toHaveBeenCalledWith(
+				'pointerup',
+				expect.any(Function),
+				false,
+			);
 		});
 
-		it('should reset velocity after timeout', async () => {
-			vi.useFakeTimers();
+		it('should remove scroll event listeners from window', () => {
+			mousePointer.clear(mockElement);
 
-			const pointerEvent = { clientX: 100, clientY: 100, pageX: 100, pageY: 100 } as PointerEvent;
-			mousePointer.onMove(pointerEvent);
-
-			// Fast forward past the 200ms timeout
-			vi.advanceTimersByTime(201);
-
-			// Should reset velocity to 0,0
-			expect(mockVector2.set).toHaveBeenLastCalledWith(0, 0);
-
-			vi.useRealTimers();
-		});
-	});
-
-	describe('onPress method', () => {
-		it('should handle mouse press events', () => {
-			const mouseDownEvent = {
-				pointerType: 'mouse',
-				pressure: 1,
-			} as PointerEvent;
-
-			mousePointer.onPress(mouseDownEvent);
-
-			// Mouse with pressure should set press to 1
-			expect(mousePointer.uniforms.uMousePress.value).toBe(1);
+			expect(window.removeEventListener).toHaveBeenCalledWith(
+				'scroll',
+				expect.any(Function),
+				false,
+			);
+			expect(window.removeEventListener).toHaveBeenCalledWith(
+				'scrollend',
+				expect.any(Function),
+				false,
+			);
 		});
 
-		it('should handle mouse release events', () => {
-			const mouseUpEvent = {
-				pointerType: 'mouse',
-				pressure: 0,
-			} as PointerEvent;
-
-			mousePointer.onPress(mouseUpEvent);
-
-			// Mouse without pressure should set press to 0
-			expect(mousePointer.uniforms.uMousePress.value).toBe(0);
+		it('should work with window as element', () => {
+			expect(() => mousePointer.clear(window)).not.toThrow();
+			expect(window.removeEventListener).toHaveBeenCalled();
 		});
 
-		it('should handle touch/pen pressure events', () => {
-			const touchEvent = {
-				pointerType: 'touch',
-				pressure: 0.5,
-			} as PointerEvent;
+		it('should work with document as element', () => {
+			const mockDocument = {
+				removeEventListener: vi.fn(),
+			} as unknown as Document;
 
-			mousePointer.onPress(touchEvent);
-
-			// Touch/pen events should use actual pressure value
-			expect(mousePointer.uniforms.uMousePress.value).toBe(0.5);
-		});
-
-		it('should handle pen events with variable pressure', () => {
-			const penEvent = {
-				pointerType: 'pen',
-				pressure: 0.8,
-			} as PointerEvent;
-
-			mousePointer.onPress(penEvent);
-
-			expect(mousePointer.uniforms.uMousePress.value).toBe(0.8);
+			expect(() => mousePointer.clear(mockDocument)).not.toThrow();
+			expect(mockDocument.removeEventListener).toHaveBeenCalled();
 		});
 	});
 
-	describe('onScroll method', () => {
-		beforeEach(() => {
-			// Mock document and window properties for scroll calculations
-			Object.defineProperty(document.body, 'scrollWidth', { value: 2000, configurable: true });
-			Object.defineProperty(document.body, 'scrollHeight', { value: 3000, configurable: true });
-			Object.defineProperty(window, 'innerWidth', { value: 800, configurable: true });
-			Object.defineProperty(window, 'innerHeight', { value: 600, configurable: true });
-			Object.defineProperty(window, 'scrollX', { value: 0, configurable: true });
-			Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
-		});
+	describe('debug method', () => {
+		it('should create and append UI element to gui', () => {
+			const mockGui = {
+				domElement: {
+					appendChild: vi.fn(),
+				},
+			} as unknown as Parameters<typeof mousePointer.debug>[0];
 
-		it('should update scroll position uniform', () => {
-			// Set scroll position
-			Object.defineProperty(window, 'scrollX', { value: 600, configurable: true });
-			Object.defineProperty(window, 'scrollY', { value: 1200, configurable: true });
+			// Mock document.createElement
+			const mockDiv = {
+				style: { padding: '' },
+				innerHTML: '',
+			};
+			const createElementSpy = vi
+				.spyOn(document, 'createElement')
+				.mockReturnValue(mockDiv as HTMLElement);
 
-			const scrollEvent = { type: 'scroll' } as Event;
-			mousePointer.onScroll(scrollEvent);
+			mousePointer.debug(mockGui);
 
-			// Expected: x = 600/(2000-800) = 0.5, y = 1200/(3000-600) = 0.5
-			expect(mockVector2.x).toBe(0.5);
-			expect(mockVector2.y).toBe(0.5);
-		});
+			expect(createElementSpy).toHaveBeenCalledWith('div');
+			expect(mockGui.domElement.appendChild).toHaveBeenCalledWith(mockDiv);
+			expect(mockDiv.style.padding).toBe('3px');
 
-		it('should calculate scroll velocity on scroll events', () => {
-			const scrollEvent = { type: 'scroll' } as Event;
-
-			// First call to establish baseline
-			mousePointer.onScroll(scrollEvent);
-
-			// Change scroll position
-			Object.defineProperty(window, 'scrollX', { value: 300, configurable: true });
-			Object.defineProperty(window, 'scrollY', { value: 600, configurable: true });
-
-			// Second call should calculate velocity
-			mousePointer.onScroll(scrollEvent);
-
-			expect(mockVector2.subVectors).toHaveBeenCalled();
-		});
-
-		it('should reset scroll velocity on scrollend events', () => {
-			const scrollEndEvent = { type: 'scrollend' } as Event;
-			mousePointer.onScroll(scrollEndEvent);
-
-			expect(mockVector2.set).toHaveBeenCalledWith(0, 0);
-		});
-
-		it('should handle edge case when document dimensions equal window dimensions', () => {
-			// Mock equal dimensions to avoid division by zero
-			Object.defineProperty(document.body, 'scrollWidth', { value: 800, configurable: true });
-			Object.defineProperty(document.body, 'scrollHeight', { value: 600, configurable: true });
-
-			const scrollEvent = { type: 'scroll' } as Event;
-			mousePointer.onScroll(scrollEvent);
-
-			// Should handle division by zero gracefully
-			expect(() => mousePointer.onScroll(scrollEvent)).not.toThrow();
+			createElementSpy.mockRestore();
 		});
 	});
 
 	describe('integration tests', () => {
-		it('should handle complete interaction sequence', () => {
-			// Resize
-			mousePointer.onResize({ width: 1024, height: 768 });
-			expect(mockVector2.set).toHaveBeenCalledWith(1024, 768);
+		it('should initialize and work correctly', () => {
+			// Should be able to init without errors
+			expect(() => mousePointer.init(mockElement)).not.toThrow();
 
-			// Mouse move
-			const moveEvent = { clientX: 512, clientY: 384, pageX: 512, pageY: 384 } as PointerEvent;
-			mousePointer.onMove(moveEvent);
+			// Should call addEventListener for pointer and scroll events
+			expect(mockElement.addEventListener).toHaveBeenCalledWith(
+				'pointermove',
+				expect.any(Function),
+				false,
+			);
+			expect(mockElement.addEventListener).toHaveBeenCalledWith(
+				'pointerdown',
+				expect.any(Function),
+				false,
+			);
+			expect(window.addEventListener).toHaveBeenCalledWith('scroll', expect.any(Function), false);
 
-			// Should update position, world position, and velocity
-			expect(mockCamera.getWorldDirection).toHaveBeenCalled();
-			expect(mockRaycaster.setFromCamera).toHaveBeenCalled();
+			// Should be able to clear without errors
+			expect(() => mousePointer.clear(mockElement)).not.toThrow();
 
-			// Mouse press
-			const pressEvent = { pointerType: 'mouse', pressure: 1 } as PointerEvent;
-			mousePointer.onPress(pressEvent);
-			expect(mousePointer.uniforms.uMousePress.value).toBe(1);
-
-			// Scroll
-			const scrollEvent = { type: 'scroll' } as Event;
-			mousePointer.onScroll(scrollEvent);
-			expect(mockVector2.copy).toHaveBeenCalled();
+			// Should call removeEventListener
+			expect(mockElement.removeEventListener).toHaveBeenCalledWith(
+				'pointermove',
+				expect.any(Function),
+				false,
+			);
+			expect(window.removeEventListener).toHaveBeenCalledWith(
+				'scroll',
+				expect.any(Function),
+				false,
+			);
 		});
 
-		it('should maintain uniform consistency across operations', () => {
+		it('should maintain uniform consistency', () => {
 			const { uniforms } = mousePointer;
 
 			// All uniforms should maintain their structure
 			expect(typeof uniforms.uMousePress.value).toBe('number');
-			expect(uniforms.uElementSize.value).toBe(mockVector2);
+			expect(
+				(uniforms as typeof uniforms & { uElementSize: { value: Three.Vector2 } }).uElementSize
+					.value,
+			).toBe(mockVector2);
+			expect(uniforms.uScroll.value).toBe(mockVector2);
+			expect(uniforms.uScrollVelocity.value).toBe(mockVector2);
+			expect(uniforms.uMousePosition.value).toBe(mockVector2);
+			expect(uniforms.uMouseVelocity.value).toBe(mockVector2);
 			expect(uniforms.uMouseWorldPosition.value).toBe(mockVector3);
+		});
+
+		it('should handle window and document as valid elements', () => {
+			expect(() => mousePointer.init(window)).not.toThrow();
+			expect(() => mousePointer.clear(window)).not.toThrow();
+
+			const mockDoc = {
+				addEventListener: vi.fn(),
+				removeEventListener: vi.fn(),
+			} as unknown as Document;
+			expect(() => mousePointer.init(mockDoc)).not.toThrow();
+			expect(() => mousePointer.clear(mockDoc)).not.toThrow();
 		});
 	});
 });

@@ -39,7 +39,7 @@ class Resizer extends MonoEventEmitter<[{ width: number; height: number; pixelRa
 	}
 
 	set resolutionFactor(n: number) {
-		this.#resolutionFactor = clamp(n, 0.001, 1);
+		this.#resolutionFactor = clamp(n, 0.01, 1);
 		this.fire();
 	}
 

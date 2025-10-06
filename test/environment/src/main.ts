@@ -26,7 +26,7 @@ const click = () => {
 click();
 debugBtn.addEventListener('click', click);
 
-if (import.meta.hot) {
+if (import.meta?.hot) {
 	import.meta.hot.dispose(() => {
 		debugBtn.removeEventListener('click', click);
 		cube.geometry.dispose();

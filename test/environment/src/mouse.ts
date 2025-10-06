@@ -11,7 +11,7 @@ const sphere = new Mesh(new SphereGeometry(1, 32, 32), new MeshBasicMaterial({ c
 
 scene.instance.add(sphere);
 
-if (import.meta.hot) {
+if (import.meta?.hot) {
 	import.meta.hot.dispose(() => {
 		sphere.geometry.dispose();
 		(sphere.material as MeshBasicMaterial).dispose();
