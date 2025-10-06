@@ -1,4 +1,4 @@
-# Joeat - Three.js Engine Library
+# Joeat - Utils
 
 TypeScript library providing modular wrappers and utilities for Three.js and other utility function for every day work. Built with type safety, dependency injection pattern, and testing.
 
@@ -15,7 +15,7 @@ TypeScript library providing modular wrappers and utilities for Three.js and oth
 
 ```bash
 npm install joeat
-npx degit https://github.com/jonathan-j8/joeat.git .
+npx degit https://github.com/Jonathan-J8/joeat-utils.git .
 ```
 
 ## Quick Start
