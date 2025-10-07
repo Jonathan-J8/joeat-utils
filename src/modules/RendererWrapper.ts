@@ -34,9 +34,11 @@ export default class GlRendererWrapper {
 		// this.composer.addPass(renderPass);
 	}
 
-	addEffect = (pass: Pass) => {
-		if (!this.composer || !this.instance) return;
-		this.composer.addPass(pass);
+	addEffect = (...pass: Pass[]) => {
+		pass.forEach((p) => {
+			if (!this.composer || !this.instance) return console.warn('EffectComposer not initialized');
+			this.composer.addPass(p);
+		});
 	};
 
 	removeEffect = (...pass: Pass[]) => {

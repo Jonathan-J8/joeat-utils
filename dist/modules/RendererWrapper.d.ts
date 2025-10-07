@@ -16,7 +16,7 @@ export default class GlRendererWrapper {
         Vector2: typeof Three.Vector2;
         EffectComposer?: typeof TEffectComposer;
     });
-    addEffect: (pass: Pass) => void;
+    addEffect: (...pass: Pass[]) => void;
     removeEffect: (...pass: Pass[]) => void;
     update: (scene: Three.Scene, camera: Three.Camera, delta?: number) => void;
     resize: (o: {

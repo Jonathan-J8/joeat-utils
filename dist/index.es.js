@@ -361,8 +361,11 @@ class ot {
     r(this, "uniforms");
     r(this, "instance");
     r(this, "composer");
-    r(this, "addEffect", (e) => {
-      !this.composer || !this.instance || this.composer.addPass(e);
+    r(this, "addEffect", (...e) => {
+      e.forEach((t) => {
+        if (!this.composer || !this.instance) return console.warn("EffectComposer not initialized");
+        this.composer.addPass(t);
+      });
     });
     r(this, "removeEffect", (...e) => {
       e.forEach((t) => {

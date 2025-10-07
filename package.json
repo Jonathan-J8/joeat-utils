@@ -29,12 +29,16 @@
 			"require": "./dist/index.cjs.js"
 		}
 	},
+	"author": {
+		"name": "Jonathan-J8",
+		"email": "hello@joeat.xyz"
+	},
 	"types": "dist/index.d.ts",
 	"main": "dist/index.cjs.js",
 	"module": "dist/index.es.js",
 	"name": "joeat-utils",
 	"type": "module",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"private": false,
 	"scripts": {
 		"build": "NODE_ENV=production tsc && vite build && node ./postbuild.config.cjs",
