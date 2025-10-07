@@ -14,23 +14,70 @@ TypeScript library providing modular wrappers and utilities for Three.js and oth
 ## Installation
 
 ```bash
-# recommended
-npm install github:Jonathan-J8/joeat-utils
-# or if you want just the compiled packages
-npx degit https://github.com/Jonathan-J8/joeat-utils/dist ./joeat-utils
+npm install github:Jonathan-J8/joeat-utils#dist-only
+# or
+npx degit https://github.com/Jonathan-J8/joeat-utils#dist-only
+```
+
+## Example
+
+Find the example [here](/example)
+
+### Run the exemple
+
+```bash
+npm run dev
 ```
 
 ## Quick Start
+
+### Common Module Pattern
+
+Most modules follow a consistent API pattern for predictable usage:
+
+#### 🏗️ **Constructor Pattern**
+
+```typescript
+const module = new ModuleName({
+	instance: threeJsObject, // Three.js object to wrap
+	...dependencies, // Required Three.js classes for tree-shaking
+});
+```
+
+#### 🔧 **Core Methods**
+
+- **`resize({ width, height, pixelRatio })`** - Handle responsive updates
+- **`update({ time, deltaTime, deltaMs })`** - Animation loop integration
+- **`debug(gui: GUI)`** - Runtime debugging with lil-gui controls
+- **`clear()`** - Clean disposal and garbage collection
+
+#### 📊 **Properties**
+
+- **`module.instance`** - Access to the wrapped Three.js object
+- **`module.uniforms`** - Shader uniforms for GLSL integration
+
+#### 🎯 **Event Integration**
+
+```typescript
+const myEmitter = new MonoEventEmitter<[{ someNumber: number }]>();
+const foo = ({ someNumber }) => {
+	// you logic
+};
+myEmitter.addListener(foo);
+myEmitter.fire({ someNumber: 10 });
+myEmitter.removeListener(foo);
+myEmitter.clear();
+```
 
 ```typescript
 import { Animator, RendererWrapper, MousePointer } from 'joeat-utils';
 import * as THREE from 'three';
 
 // Create renderer with post-processing support
-const instance = new WebGLRenderer();
+const renderer = new THREE.WebGLRenderer();
 const rendererWrapper = new RendererWrapper({
-	instance,
-	Vector2,
+	instance: renderer,
+	Vector2: THREE.Vector2,
 });
 
 // Set up animation loop
@@ -40,12 +87,15 @@ animator.addListener(({ time, deltaTime }) => {
 });
 
 // Add mouse interaction
+const camera = new THREE.PerspectiveCamera();
 const mousePointer = new MousePointer({
-	element: renderer.domElement,
+	camera: camera,
 	Vector2: THREE.Vector2,
-	Vector4: THREE.Vector4,
+	Vector3: THREE.Vector3,
+	Plane: THREE.Plane,
 	Raycaster: THREE.Raycaster,
 });
+mousePointer.init(renderer.domElement);
 
 animator.play();
 ```
@@ -74,6 +124,17 @@ animator.interpolate({
 	},
 });
 
+// Animation
+animator.animate({
+	steps = 0,
+	duration = 400,
+	delay = 100,
+	iterations = 1,
+	onUpdate: () => {
+		// your animation logic
+	},
+});
+
 animator.play();
 ```
 
@@ -83,7 +144,7 @@ WebGL renderer abstraction with post-processing effects support.
 
 ```typescript
 const rendererWrapper = new RendererWrapper({
-	renderer: new THREE.WebGLRenderer(),
+	instance: new THREE.WebGLRenderer(),
 	Vector2: THREE.Vector2,
 	EffectComposer: EffectComposer, // Optional for post-processing
 });
@@ -110,18 +171,26 @@ rendererWrapper.resize({
 Mouse/pointer interaction handling with coordinate normalization.
 
 ```typescript
+const camera = new THREE.PerspectiveCamera();
 const mousePointer = new MousePointer({
-	element: canvas,
+	camera: camera,
 	Vector2: THREE.Vector2,
-	Vector4: THREE.Vector4,
+	Vector3: THREE.Vector3,
+	Plane: THREE.Plane,
 	Raycaster: THREE.Raycaster,
 });
 
+// Initialize with element
+mousePointer.init(canvas);
+
 // Access normalized coordinates and world position
 const uniforms = {
-	uMouse: mousePointer.uniforms.uMouse, // [-1, 1]
-	uMouseWorld: mousePointer.uniforms.uMouseWorld, // World coordinates
+	uMousePosition: mousePointer.uniforms.uMousePosition, // [-1, 1]
+	uMouseWorldPosition: mousePointer.uniforms.uMouseWorldPosition, // World coordinates
 	uMouseVelocity: mousePointer.uniforms.uMouseVelocity,
+	uMousePress: mousePointer.uniforms.uMousePress, // Pointer pressure
+	uScroll: mousePointer.uniforms.uScroll,
+	uScrollVelocity: mousePointer.uniforms.uScrollVelocity,
 };
 ```
 
@@ -142,6 +211,32 @@ resizer.addListener(({ width, height, pixelRatio }) => {
 // Configure quality settings
 resizer.resolutionFactor = 0.8; // Reduce resolution for performance
 resizer.maxSize = 2048; // Limit maximum dimensions
+```
+
+### CameraWrapper
+
+Camera management with controls integration and directional uniforms.
+
+```typescript
+const camera = new THREE.PerspectiveCamera(75, 2, 0.1, 1000);
+const controls = new OrbitControls(camera, canvas);
+
+const cameraWrapper = new CameraWrapper({
+	instance: camera,
+	controls: controls, // Optional
+	Vector3: THREE.Vector3,
+});
+
+// Access uniforms for shaders
+const uniforms = {
+	uDirection: cameraWrapper.uniforms.uDirection, // Camera world direction
+};
+
+// Handle resize
+cameraWrapper.resize({ width: window.innerWidth, height: window.innerHeight });
+
+// Update camera and controls
+cameraWrapper.update({ deltaTime: 0.016 });
 ```
 
 ### TaskQueue
@@ -175,7 +270,7 @@ const spring = new Spring(0, {
 });
 
 spring.to(1);
-spring.update();
+spring.update(); // Call in your animation loop
 ```
 
 ### SceneWrapper
@@ -238,17 +333,11 @@ void main() {
 # Install dependencies
 npm install
 
-# Start development server
-npm run dev
-
 # Build library
 npm run build
 
 # Run tests
 npm test
-npm run unit
-npm run integration
-npm run e2e
 
 # Lint and format
 npm run lint
@@ -263,7 +352,4 @@ npm run format
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-All commits are validated with:
-
-- ESLint + Prettier code quality checks
-- Unit/integration/e2e tests
+All commits are validated with ESLint + Prettier code quality checks and unit tests
