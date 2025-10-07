@@ -59,17 +59,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Backup dist directory before switching branches
+          cp -r dist /tmp/dist-backup
+          echo "Backed up dist directory to /tmp/dist-backup"
+
           # Create orphan branch for dist-only
           git checkout --orphan dist-only
           git reset --hard
           git clean -fd
 
-          # Copy built files from dist/
-          if [ -d "dist" ] && [ "$(ls -A dist 2>/dev/null)" ]; then
-            cp -r dist/* .
-            echo "Successfully copied files from dist/"
+          # Copy built files from backup
+          if [ -d "/tmp/dist-backup" ] && [ "$(ls -A /tmp/dist-backup 2>/dev/null)" ]; then
+            cp -r /tmp/dist-backup/* .
+            echo "Successfully copied files from backup dist directory"
           else
-            echo "Error: dist directory is empty or doesn't exist"
+            echo "Error: backup dist directory is empty or doesn't exist"
             exit 1
           fi
 
