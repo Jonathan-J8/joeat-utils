@@ -14,7 +14,10 @@ TypeScript library providing modular wrappers and utilities for Three.js and oth
 ## Installation
 
 ```bash
-npx degit https://github.com/Jonathan-J8/joeat-utils/dist ./your-empty-folder
+# recommended
+npm install github:Jonathan-J8/joeat-utils
+# or if you want just the compiled packages
+npx degit https://github.com/Jonathan-J8/joeat-utils/dist ./joeat-utils
 ```
 
 ## Quick Start
@@ -24,11 +27,10 @@ import { Animator, RendererWrapper, MousePointer } from 'joeat-utils';
 import * as THREE from 'three';
 
 // Create renderer with post-processing support
-const renderer = new WebGLRenderer();
+const instance = new WebGLRenderer();
 const rendererWrapper = new RendererWrapper({
-	renderer,
+	instance,
 	Vector2,
-	EffectComposer, // Optional
 });
 
 // Set up animation loop
