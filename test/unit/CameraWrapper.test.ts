@@ -56,7 +56,7 @@ describe('CameraWrapper', () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		cameraWrapper = new CameraWrapper({
-			camera: mockCamera,
+			instance: mockCamera,
 			controls: mockControls,
 			Vector3: mockVector3Class,
 		});
@@ -82,7 +82,7 @@ describe('CameraWrapper', () => {
 
 		it('should work without controls', () => {
 			const wrapperWithoutControls = new CameraWrapper({
-				camera: mockCamera,
+				instance: mockCamera,
 				Vector3: mockVector3Class,
 			});
 			expect(wrapperWithoutControls.controls).toBeUndefined();
@@ -136,7 +136,7 @@ describe('CameraWrapper', () => {
 
 		it('should work without controls', () => {
 			const wrapperWithoutControls = new CameraWrapper({
-				camera: mockCamera,
+				instance: mockCamera,
 				Vector3: mockVector3Class,
 			});
 
@@ -159,7 +159,7 @@ describe('CameraWrapper', () => {
 
 		it('should work without controls', () => {
 			const wrapperWithoutControls = new CameraWrapper({
-				camera: mockCamera,
+				instance: mockCamera,
 				Vector3: mockVector3Class,
 			});
 
@@ -184,7 +184,7 @@ describe('CameraWrapper', () => {
 
 		it('should work without controls', () => {
 			const wrapperWithoutControls = new CameraWrapper({
-				camera: mockCamera,
+				instance: mockCamera,
 				Vector3: mockVector3Class,
 			});
 

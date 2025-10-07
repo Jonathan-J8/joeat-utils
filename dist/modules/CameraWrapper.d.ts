@@ -11,8 +11,8 @@ export default class CameraWrapper {
     direction: Three.Vector3 | undefined;
     instance: Three.PerspectiveCamera | Three.OrthographicCamera;
     controls: OrbitControls | FlyControls | ArcballControls | DragControls | undefined;
-    constructor({ camera, controls, Vector3, }: {
-        camera: Three.PerspectiveCamera | Three.OrthographicCamera;
+    constructor({ instance, controls, Vector3, }: {
+        instance: Three.PerspectiveCamera | Three.OrthographicCamera;
         controls?: OrbitControls;
         Vector3: typeof Three.Vector3;
     });

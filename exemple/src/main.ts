@@ -1,5 +1,4 @@
 import { BoxGeometry, Mesh, type Material } from 'three';
-
 import './mouse';
 import './style.css';
 import useThreeWrapper from './useThreeWrapper';

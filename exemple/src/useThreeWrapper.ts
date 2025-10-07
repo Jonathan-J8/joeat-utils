@@ -1,32 +1,36 @@
 import { PerspectiveCamera, Scene, Vector2, Vector3, WebGLRenderer } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import GUI from 'three/examples/jsm/libs/lil-gui.module.min.js';
-import { Animator, CameraWrapper, RendererWrapper, Resizer, SceneWrapper } from '../../../src';
+import { Animator, CameraWrapper, RendererWrapper, Resizer, SceneWrapper } from '../../src';
 
+// THREE
 const canvas = document.getElementById('three') as HTMLCanvasElement;
-const renderer = new RendererWrapper({ renderer: new WebGLRenderer({ canvas }), Vector2 });
+const threeRenderer = new WebGLRenderer({ canvas });
+const threeCamera = new PerspectiveCamera(75, 2, 0.1, 1000);
+const threeScene = new Scene();
+const threeControls = new OrbitControls(threeCamera, canvas);
 
-const cam = new PerspectiveCamera(75, 2, 0.1, 1000);
+// WRAPPERS & EMITTERS
+const animator = new Animator();
+const resizer = new Resizer(canvas);
+const scene = new SceneWrapper({ instance: threeScene });
+const renderer = new RendererWrapper({ instance: threeRenderer, Vector2 });
 const camera = new CameraWrapper({
-	camera: cam,
-	controls: new OrbitControls(cam, canvas),
+	instance: threeCamera,
+	controls: threeControls,
 	Vector3,
 });
-camera.instance.position.z = 5;
 
-const resizer = new Resizer(canvas);
+camera.instance.position.z = 5;
+scene.instance.add(camera.instance);
 resizer.addListener(camera.resize, renderer.resize);
 resizer.fire();
-
-const scene = new SceneWrapper({ scene: new Scene() });
-scene.instance.add(camera.instance);
-
-const animator = new Animator();
 animator.addListener(() => {
 	renderer.update(scene.instance, camera.instance, animator.uniforms.uDeltaTime.value);
 });
 animator.play(renderer.instance);
 
+// GUI
 const gui = new GUI();
 animator.debug(gui);
 resizer.debug(gui);
@@ -40,6 +44,7 @@ const debug = () => {
 debug();
 window.addEventListener('hashchange', debug);
 
+// HMR
 if (import.meta?.hot) {
 	import.meta.hot.dispose(() => {
 		window.removeEventListener('hashchange', debug);
@@ -52,6 +57,7 @@ if (import.meta?.hot) {
 	});
 }
 
+// HOOK
 const useThreeWrapper = () => {
 	return { gui, canvas, animator, resizer, renderer, scene, camera };
 };

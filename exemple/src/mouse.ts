@@ -1,5 +1,5 @@
 import { Mesh, MeshBasicMaterial, Plane, Raycaster, SphereGeometry, Vector2, Vector3 } from 'three';
-import { MousePointer } from '../../../src';
+import { MousePointer } from '../../src';
 import useThreeWrapper from './useThreeWrapper';
 
 const { camera, scene, gui, canvas } = useThreeWrapper();

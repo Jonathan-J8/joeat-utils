@@ -1,6 +1,6 @@
-echo "⚙️ Running build before staging..." \
+echo "HUSKY ⚙️ Running build before staging..." \
 && npm run build \
 && git add dist \
 && npm run lint \
 && npm run test \
-&& echo "⚙️ Ready to push" 
+&& echo "HUSKY ⚙️ Ready to push" 

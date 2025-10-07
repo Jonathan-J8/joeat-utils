@@ -11,8 +11,8 @@ export default class GlRendererWrapper {
     uniforms: Uniforms;
     instance: Three.WebGLRenderer;
     composer: TEffectComposer | undefined;
-    constructor({ renderer, Vector2, EffectComposer, }: {
-        renderer: Three.WebGLRenderer;
+    constructor({ instance, Vector2, EffectComposer, }: {
+        instance: Three.WebGLRenderer;
         Vector2: typeof Three.Vector2;
         EffectComposer?: typeof TEffectComposer;
     });

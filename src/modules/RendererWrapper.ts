@@ -14,18 +14,18 @@ export default class GlRendererWrapper {
 	composer: TEffectComposer | undefined;
 
 	constructor({
-		renderer,
+		instance,
 		Vector2,
 		EffectComposer,
 	}: {
-		renderer: Three.WebGLRenderer;
+		instance: Three.WebGLRenderer;
 		Vector2: typeof Three.Vector2;
 		EffectComposer?: typeof TEffectComposer;
 	}) {
 		this.uniforms = Object.freeze({
 			uResolution: { value: new Vector2() },
 		});
-		this.instance = renderer;
+		this.instance = instance;
 		this.instance.debug.checkShaderErrors = false;
 
 		if (!EffectComposer) return;

@@ -18,18 +18,18 @@ export default class CameraWrapper {
 	controls: OrbitControls | FlyControls | ArcballControls | DragControls | undefined;
 
 	constructor({
-		camera,
+		instance,
 		controls,
 		Vector3,
 	}: {
-		camera: Three.PerspectiveCamera | Three.OrthographicCamera;
+		instance: Three.PerspectiveCamera | Three.OrthographicCamera;
 		controls?: OrbitControls;
 		Vector3: typeof Three.Vector3;
 	}) {
 		this.uniforms = Object.freeze({
 			uDirection: { value: new Vector3() },
 		});
-		this.instance = camera;
+		this.instance = instance;
 		this.controls = controls;
 		if (!this.controls) return;
 		this.controls.addEventListener('change', () => {

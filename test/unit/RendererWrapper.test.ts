@@ -72,7 +72,7 @@ describe('RendererWrapper', () => {
 		vi.clearAllMocks();
 
 		rendererWrapper = new RendererWrapper({
-			renderer: mockRenderer,
+			instance: mockRenderer,
 			Vector2: mockVector2Class,
 			EffectComposer: mockEffectComposerClass,
 		});
@@ -111,7 +111,7 @@ describe('RendererWrapper', () => {
 
 		it('should work without EffectComposer', () => {
 			const wrapperWithoutComposer = new RendererWrapper({
-				renderer: mockRenderer,
+				instance: mockRenderer,
 				Vector2: mockVector2Class,
 			});
 
@@ -128,7 +128,7 @@ describe('RendererWrapper', () => {
 
 		it('should handle missing composer gracefully', () => {
 			const wrapperWithoutComposer = new RendererWrapper({
-				renderer: mockRenderer,
+				instance: mockRenderer,
 				Vector2: mockVector2Class,
 			});
 
@@ -163,7 +163,7 @@ describe('RendererWrapper', () => {
 
 		it('should handle missing composer gracefully', () => {
 			const wrapperWithoutComposer = new RendererWrapper({
-				renderer: mockRenderer,
+				instance: mockRenderer,
 				Vector2: mockVector2Class,
 			});
 
@@ -183,7 +183,7 @@ describe('RendererWrapper', () => {
 
 		it('should render directly when no composer', () => {
 			const wrapperWithoutComposer = new RendererWrapper({
-				renderer: mockRenderer,
+				instance: mockRenderer,
 				Vector2: mockVector2Class,
 			});
 
@@ -228,7 +228,7 @@ describe('RendererWrapper', () => {
 
 		it('should work without composer', () => {
 			const wrapperWithoutComposer = new RendererWrapper({
-				renderer: mockRenderer,
+				instance: mockRenderer,
 				Vector2: mockVector2Class,
 			});
 			const resizeParams = { width: 1024, height: 768, pixelRatio: 1.5 };
@@ -283,7 +283,7 @@ describe('RendererWrapper', () => {
 
 		it('should handle missing composer gracefully', () => {
 			const wrapperWithoutComposer = new RendererWrapper({
-				renderer: mockRenderer,
+				instance: mockRenderer,
 				Vector2: mockVector2Class,
 			});
 

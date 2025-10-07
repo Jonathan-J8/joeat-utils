@@ -29,7 +29,7 @@ describe('SceneWrapper', () => {
 
 	beforeEach(() => {
 		vi.clearAllMocks();
-		sceneWrapper = new SceneWrapper({ scene: mockScene });
+		sceneWrapper = new SceneWrapper({ instance: mockScene });
 	});
 
 	describe('constructor', () => {
@@ -81,7 +81,7 @@ describe('SceneWrapper', () => {
 				clear: vi.fn(),
 			} as unknown as Three.Scene;
 
-			const wrapper = new SceneWrapper({ scene: sceneWithArray });
+			const wrapper = new SceneWrapper({ instance: sceneWithArray });
 			wrapper.clear();
 
 			materialArray.forEach((mat) => {
@@ -107,7 +107,7 @@ describe('SceneWrapper', () => {
 				clear: vi.fn(),
 			} as unknown as Three.Scene;
 
-			const wrapper = new SceneWrapper({ scene: sceneWithNested });
+			const wrapper = new SceneWrapper({ instance: sceneWithNested });
 			wrapper.clear();
 
 			expect(parentMesh.geometry.dispose).toHaveBeenCalled();
@@ -126,7 +126,7 @@ describe('SceneWrapper', () => {
 				clear: vi.fn(),
 			} as unknown as Three.Scene;
 
-			const wrapper = new SceneWrapper({ scene: sceneWithEmpty });
+			const wrapper = new SceneWrapper({ instance: sceneWithEmpty });
 
 			expect(() => wrapper.clear()).not.toThrow();
 			expect(sceneWithEmpty.clear).toHaveBeenCalled();
@@ -138,7 +138,7 @@ describe('SceneWrapper', () => {
 				clear: vi.fn(),
 			} as unknown as Three.Scene;
 
-			const wrapper = new SceneWrapper({ scene: sceneWithNulls });
+			const wrapper = new SceneWrapper({ instance: sceneWithNulls });
 
 			expect(() => wrapper.clear()).not.toThrow();
 		});
@@ -160,7 +160,7 @@ describe('SceneWrapper', () => {
 				clear: vi.fn(),
 			} as unknown as Three.Scene;
 
-			const wrapper = new SceneWrapper({ scene: sceneWithSimple });
+			const wrapper = new SceneWrapper({ instance: sceneWithSimple });
 			wrapper.clear();
 
 			expect(simpleMaterial.dispose).toHaveBeenCalled();
@@ -184,12 +184,12 @@ describe('SceneWrapper', () => {
 				children: [],
 			} as unknown as Three.Mesh;
 
-			const scene = {
+			const instance = {
 				children: [mesh],
 				clear: vi.fn(),
 			} as unknown as Three.Scene;
 
-			const wrapper = new SceneWrapper({ scene });
+			const wrapper = new SceneWrapper({ instance });
 			wrapper.clear();
 
 			expect(material.map.dispose).toHaveBeenCalled();
@@ -221,7 +221,7 @@ describe('SceneWrapper', () => {
 				clear: vi.fn(),
 			} as unknown as Three.Scene;
 
-			const wrapper = new SceneWrapper({ scene: emptyScene });
+			const wrapper = new SceneWrapper({ instance: emptyScene });
 
 			expect(() => wrapper.clear()).not.toThrow();
 			expect(emptyScene.clear).toHaveBeenCalled();
@@ -251,7 +251,7 @@ describe('SceneWrapper', () => {
 				clear: vi.fn(),
 			} as unknown as Three.Scene;
 
-			const wrapper = new SceneWrapper({ scene: deepScene });
+			const wrapper = new SceneWrapper({ instance: deepScene });
 			wrapper.clear();
 
 			expect(level1.geometry.dispose).toHaveBeenCalled();

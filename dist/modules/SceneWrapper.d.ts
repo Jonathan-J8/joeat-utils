@@ -1,8 +1,8 @@
 import type * as Three from 'three';
 export default class CustomScene {
     instance: Three.Scene;
-    constructor({ scene }: {
-        scene: Three.Scene;
+    constructor({ instance }: {
+        instance: Three.Scene;
     });
     private static disposeMaterial;
     private static disposeNode;
