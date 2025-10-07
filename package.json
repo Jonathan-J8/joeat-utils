@@ -29,15 +29,15 @@
 			"require": "./dist/index.cjs.js"
 		}
 	},
-	"name": "joeat-utils",
-	"type": "module",
 	"types": "dist/index.d.ts",
-	"version": "1.0.0",
 	"main": "dist/index.cjs.js",
 	"module": "dist/index.es.js",
+	"name": "joeat-utils",
+	"type": "module",
+	"version": "1.0.0",
 	"private": false,
 	"scripts": {
-		"build": "NODE_ENV=production tsc && vite build",
+		"build": "NODE_ENV=production tsc && vite build &&  node ./postbuild.cjs",
 		"dev": "cd ./exemple && vite",
 		"prepare": "husky",
 		"lint": "prettier --check . && eslint .",

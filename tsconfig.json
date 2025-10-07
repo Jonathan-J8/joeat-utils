@@ -9,12 +9,7 @@
 		"declarationMap": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
-		/* index.d.ts file */
-		// "declaration": true, // ✅ generate .d.ts files
-		// "emitDeclarationOnly": true, // ❗ no .js output
-		// "outDir": "dist", // where to place .d.ts files
-		// "rootDir": "src", // root of your source files
-		/* Bundler mode */
+
 		"moduleResolution": "bundler",
 		"noEmit": true,
 		"noUnusedParameters": true,
@@ -22,7 +17,7 @@
 		"noUncheckedSideEffectImports": true,
 		"noUnusedLocals": true,
 		"skipLibCheck": true,
-		/* Linting */
+
 		"strict": true,
 		"target": "ES2022",
 		"useDefineForClassFields": true,

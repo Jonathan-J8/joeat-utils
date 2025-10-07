@@ -1,0 +1,16 @@
+{
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.es.js",
+      "require": "./index.cjs.js"
+    }
+  },
+  "types": "index.d.ts",
+  "main": "index.cjs.js",
+  "module": "index.es.js",
+  "name": "joeat-utils",
+  "type": "module",
+  "version": "1.0.0",
+  "private": false
+}
