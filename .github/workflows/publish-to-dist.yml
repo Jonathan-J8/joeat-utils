@@ -1,13 +1,19 @@
 name: Publish to dist branch
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+  # Manually trigger the workflow from the Actions tab
+  # Uncomment the following lines to trigger on pushes to main branch
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   publish-to-dist-branch:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
 
     steps:
       - name: Checkout repository
@@ -18,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 'lts/*'
 
       - name: Install dependencies
         run: npm ci
