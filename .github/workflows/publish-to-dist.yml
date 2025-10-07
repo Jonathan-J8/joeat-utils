@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  publish-to-dist-branch:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,6 +25,18 @@ jobs:
 
       - name: Build project
         run: npm run build
+
+      - name: Verify build output
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Error: dist directory not found after build"
+            exit 1
+          fi
+          if [ -z "$(ls -A dist 2>/dev/null)" ]; then
+            echo "Error: dist directory is empty"
+            exit 1
+          fi
+          echo "Build verification successful - dist directory contains files"
 
       - name: Read version from package.json
         id: pkg
@@ -53,15 +65,35 @@ jobs:
           git clean -fd
 
           # Copy built files from dist/
-          cp -r dist/* .
+          if [ -d "dist" ] && [ "$(ls -A dist 2>/dev/null)" ]; then
+            cp -r dist/* .
+            echo "Successfully copied files from dist/"
+          else
+            echo "Error: dist directory is empty or doesn't exist"
+            exit 1
+          fi
 
           # Commit and push dist-only branch
           git add .
-          git commit -m "Deploy version v${{ steps.pkg.outputs.version }}"
-          git push origin dist-only --force
+          if ! git commit -m "Deploy version v${{ steps.pkg.outputs.version }}"; then
+            echo "Error: Failed to commit changes"
+            exit 1
+          fi
+          if ! git push origin dist-only --force; then
+            echo "Error: Failed to push to dist-only branch"
+            exit 1
+          fi
+          echo "Successfully deployed to dist-only branch"
 
       - name: Tag this version
         if: steps.check.outputs.exists == 'false'
         run: |
-          git tag v${{ steps.pkg.outputs.version }}
-          git push origin v${{ steps.pkg.outputs.version }}
+          if ! git tag v${{ steps.pkg.outputs.version }}; then
+            echo "Error: Failed to create tag v${{ steps.pkg.outputs.version }}"
+            exit 1
+          fi
+          if ! git push origin v${{ steps.pkg.outputs.version }}; then
+            echo "Error: Failed to push tag v${{ steps.pkg.outputs.version }}"
+            exit 1
+          fi
+          echo "Successfully created and pushed tag v${{ steps.pkg.outputs.version }}"
