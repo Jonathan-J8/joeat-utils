@@ -37,7 +37,7 @@
 	"version": "1.0.0",
 	"private": false,
 	"scripts": {
-		"build": "NODE_ENV=production tsc && vite build &&  node ./postbuild.cjs",
+		"build": "NODE_ENV=production tsc && vite build && node ./postbuild.config.cjs",
 		"dev": "cd ./exemple && vite",
 		"prepare": "husky",
 		"lint": "prettier --check . && eslint .",
