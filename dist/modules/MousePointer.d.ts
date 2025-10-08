@@ -30,6 +30,9 @@ declare class MousePointer {
         Raycaster: typeof Three.Raycaster;
         camera: Three.Camera;
     });
+    onMove: (...callbacks: (() => void)[]) => void;
+    onPress: (...callbacks: (() => void)[]) => void;
+    onScroll: (...callbacks: (() => void)[]) => void;
     init: (element: HTMLElement | Document | Window) => void;
     clear: (element: HTMLElement | Document | Window) => void;
     debug: (gui: GUI) => void;

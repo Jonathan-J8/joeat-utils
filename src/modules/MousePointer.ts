@@ -1,5 +1,6 @@
 import type * as Three from 'three';
 import type GUI from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import MonoEventEmitter from './MonoEventEmitter';
 
 type Uniforms = {
 	uScroll: { value: Three.Vector2 };
@@ -21,6 +22,9 @@ class MousePointer {
 	#camera: Three.Camera;
 	#cameraDirection: Three.Vector3;
 	#ui: HTMLElement | undefined;
+	#moveEmitter = new MonoEventEmitter();
+	#pressEmitter = new MonoEventEmitter();
+	#scrollEmitter = new MonoEventEmitter();
 
 	constructor({
 		Plane,
@@ -120,6 +124,7 @@ class MousePointer {
 		this.#updateMouseWorldPosition();
 		this.#updateMouseVelocity(e);
 		this.#updateUI();
+		this.#moveEmitter.fire();
 	};
 
 	#updateScroll = (e: Event) => {
@@ -134,6 +139,7 @@ class MousePointer {
 		if (e.type === 'scroll') uScrollVelocity.value.subVectors(uScroll.value, this.#previousScroll);
 		else uScrollVelocity.value.set(0, 0);
 		this.#updateUI();
+		this.#scrollEmitter.fire();
 	};
 
 	#updateMousePress = (e: Event) => {
@@ -143,6 +149,17 @@ class MousePointer {
 		if (isMouse) uMousePress.value = event.pressure ? 1 : 0;
 		else uMousePress.value = event.pressure;
 		this.#updateUI();
+		this.#pressEmitter.fire();
+	};
+
+	onMove = (...callbacks: (() => void)[]) => {
+		this.#moveEmitter.addListener(...callbacks);
+	};
+	onPress = (...callbacks: (() => void)[]) => {
+		this.#pressEmitter.addListener(...callbacks);
+	};
+	onScroll = (...callbacks: (() => void)[]) => {
+		this.#scrollEmitter.addListener(...callbacks);
 	};
 
 	init = (element: HTMLElement | Document | Window) => {
@@ -155,6 +172,7 @@ class MousePointer {
 	};
 
 	clear = (element: HTMLElement | Document | Window) => {
+		this.#moveEmitter.clear();
 		element.removeEventListener('pointermove', this.#updateMouseMove, false);
 		element.removeEventListener('pointerout', this.#updateMouseMove, false);
 		element.removeEventListener('pointerdown', this.#updateMousePress, false);
