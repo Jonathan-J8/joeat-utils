@@ -166,10 +166,10 @@ class rt extends ne {
       onUpdate: h,
       onComplete: u
     }) => {
-      const d = Math.abs(t), v = Math.abs(n), f = t < n ? 1 : -1;
-      let l = d;
+      const m = Math.abs(t), v = Math.abs(n), f = t < n ? 1 : -1;
+      let l = m;
       const P = (w) => {
-        l += w.deltaTime, l = ce(l, d, v), typeof h == "function" && h({ value: l * f, ...w }), l === v && (typeof u == "function" && u({ value: l * f, ...w }), this.removeListener(P));
+        l += w.deltaTime, l = ce(l, m, v), typeof h == "function" && h({ value: l * f, ...w }), l === v && (typeof u == "function" && u({ value: l * f, ...w }), this.removeListener(P));
       }, { uDeltaMs: g, uDeltaTime: x, uTime: y } = this.uniforms;
       typeof r == "function" && r({
         value: t,
@@ -184,7 +184,7 @@ class rt extends ne {
       delay: r = 0,
       iterations: h = 0,
       onStart: u,
-      onUpdate: d,
+      onUpdate: m,
       onComplete: v
     }) => {
       let f, l = 0, P = 0, g = 0;
@@ -192,9 +192,9 @@ class rt extends ne {
         const ae = Math.abs(w - l);
         if (t > 0) {
           const fe = Math.min(Math.floor(ae / n * t), t - 1);
-          fe !== P && (P = fe, X(d));
-        } else X(d);
-        ae >= n && (this.removeListener(x), X(d), X(v), g++, (h < 0 || h === 1 / 0 || g < h) && (typeof f == "number" && clearTimeout(f), r > 0 ? f = setTimeout(() => {
+          fe !== P && (P = fe, X(m));
+        } else X(m);
+        ae >= n && (this.removeListener(x), X(m), X(v), g++, (h < 0 || h === 1 / 0 || g < h) && (typeof f == "number" && clearTimeout(f), r > 0 ? f = setTimeout(() => {
           l = me(), X(u), this.addListener(x);
         }, r) : y()));
       }, y = () => {
@@ -208,7 +208,7 @@ class rt extends ne {
   }
 }
 Q = new WeakMap(), A = new WeakMap(), Y = new WeakMap(), $ = new WeakMap(), G = new WeakMap();
-var m;
+var d;
 class ot {
   constructor({
     instance: e,
@@ -219,20 +219,20 @@ class ot {
     a(this, "uniforms");
     a(this, "direction");
     a(this, "instance");
-    c(this, m);
+    c(this, d);
     a(this, "resize", ({ width: e, height: t }) => {
       const { instance: n } = this;
       n != null && n.aspect && (n.aspect = e / t), this.instance.updateProjectionMatrix();
     });
     a(this, "update", ({ deltaTime: e }) => {
-      this.instance.getWorldDirection(this.uniforms.cameraDirection.value), this.instance.getWorldScale(this.uniforms.cameraScale.value), this.instance.getWorldQuaternion(this.uniforms.cameraQuaternion.value), s(this, m) && s(this, m).update(e);
+      this.instance.getWorldDirection(this.uniforms.cameraDirection.value), this.instance.getWorldScale(this.uniforms.cameraScale.value), this.instance.getWorldQuaternion(this.uniforms.cameraQuaternion.value), s(this, d) && s(this, d).enabled && s(this, d).update(e);
     });
     a(this, "clear", () => {
-      this.instance.clear(), s(this, m) && (s(this, m).disconnect(), s(this, m).dispose());
+      this.instance.clear(), s(this, d) && (s(this, d).disconnect(), s(this, d).dispose());
     });
     a(this, "debug", (e) => {
-      s(this, m) && e.add({ enabled: s(this, m).enabled }, "enabled").name("camera controls").onChange((n) => {
-        s(this, m) && (s(this, m).enabled = n);
+      s(this, d) && e.add({ enabled: s(this, d).enabled }, "enabled").name("camera controls").onChange((n) => {
+        s(this, d) && (s(this, d).enabled = n);
       });
       const { instance: t } = this;
       e.add(t.position, "x").name("camera position x").listen(), e.add(t.position, "y").name("camera position y").listen(), e.add(t.position, "z").name("camera position z").listen(), e.add(this.uniforms.cameraDirection.value, "x").name("camera direction x").disable().listen(), e.add(this.uniforms.cameraDirection.value, "y").name("camera direction y").disable().listen(), e.add(this.uniforms.cameraDirection.value, "z").name("camera direction z").disable().listen();
@@ -241,14 +241,14 @@ class ot {
       cameraDirection: { value: new n() },
       cameraScale: { value: new n() },
       cameraQuaternion: { value: new r() }
-    }), this.instance = e, t && o(this, m, t);
+    }), this.instance = e, t && o(this, d, t);
   }
   get controls() {
-    if (!s(this, m)) throw new Error("Controls not initialized");
-    return s(this, m);
+    if (!s(this, d)) throw new Error("Controls not initialized");
+    return s(this, d);
   }
 }
-m = new WeakMap();
+d = new WeakMap();
 var re, U, J, K, B, S, E, oe, Z, _, M, V, q, j, ee, he, ue, le;
 class at {
   constructor({
@@ -293,16 +293,16 @@ class at {
       if (n instanceof HTMLCanvasElement)
         r = n.width, h = n.height;
       else if (n instanceof HTMLElement) {
-        const { width: d, height: v } = n.getBoundingClientRect();
-        r = d, h = v;
+        const { width: m, height: v } = n.getBoundingClientRect();
+        r = m, h = v;
       } else
         r = window.innerWidth, h = window.innerHeight;
       const { uPointerPosition: u } = this.uniforms;
       u.value.x = t.clientX / r * 2 - 1, u.value.y = -(t.clientY / h) * 2 + 1;
     });
     c(this, ue, (e) => {
-      const t = e, { uPointerPositionVelocity: n } = this.uniforms, r = t.pageX, h = t.pageY, u = s(this, B).x, d = s(this, B).y;
-      n.value.x = Math.abs(r - u), n.value.y = Math.abs(h - d), s(this, B).set(r, h), typeof s(this, S) == "number" && clearTimeout(s(this, S)), o(this, S, setTimeout(() => {
+      const t = e, { uPointerPositionVelocity: n } = this.uniforms, r = t.pageX, h = t.pageY, u = s(this, B).x, m = s(this, B).y;
+      n.value.x = Math.abs(r - u), n.value.y = Math.abs(h - m), s(this, B).set(r, h), typeof s(this, S) == "number" && clearTimeout(s(this, S)), o(this, S, setTimeout(() => {
         n.value.set(0, 0);
       }, s(this, oe)));
     });
@@ -361,9 +361,9 @@ class at {
 }
 re = new WeakMap(), U = new WeakMap(), J = new WeakMap(), K = new WeakMap(), B = new WeakMap(), S = new WeakMap(), E = new WeakMap(), oe = new WeakMap(), Z = new WeakMap(), _ = new WeakMap(), M = new WeakMap(), V = new WeakMap(), q = new WeakMap(), j = new WeakMap(), ee = new WeakMap(), he = new WeakMap(), ue = new WeakMap(), le = new WeakMap();
 const Te = function(i, e, t, n) {
-  const r = function(h, u, d) {
+  const r = function(h, u, m) {
     var l, P;
-    const v = (l = h.getShaderInfoLog(u)) == null ? void 0 : l.trim(), f = "Errors in " + d + `:
+    const v = (l = h.getShaderInfoLog(u)) == null ? void 0 : l.trim(), f = "Errors in " + m + `:
 
 ` + v;
     if (v !== "") {
@@ -537,8 +537,8 @@ class ut {
     a(this, "to", (e, t) => (o(this, O, e), Math.abs(s(this, N)) < s(this, T).threshold && Math.abs(s(this, O) - s(this, p)) < s(this, T).threshold ? this : (t && o(this, T, { ...s(this, T), ...t }), o(this, L, !1), this)));
     a(this, "update", (e = 0.016) => {
       if (s(this, L)) return;
-      const { mass: t, tension: n, friction: r, threshold: h, onComplete: u, onUpdate: d } = s(this, T), v = Math.min(e, 0.06), f = s(this, N) ?? 0, l = typeof s(this, p) == "number" ? s(this, p) : s(this, se), P = -1 * n * (l - s(this, O)), g = -1 * f * r, x = (P + g) / t, y = f + x * v, w = l + y * v;
-      o(this, L, Math.abs(y) < h && Math.abs(w - s(this, O)) < h), o(this, p, s(this, L) ? s(this, O) : w), o(this, N, y), s(this, L) ? (o(this, p, s(this, O)), u && u(s(this, p))) : d && d(s(this, p));
+      const { mass: t, tension: n, friction: r, threshold: h, onComplete: u, onUpdate: m } = s(this, T), v = Math.min(e, 0.06), f = s(this, N) ?? 0, l = typeof s(this, p) == "number" ? s(this, p) : s(this, se), P = -1 * n * (l - s(this, O)), g = -1 * f * r, x = (P + g) / t, y = f + x * v, w = l + y * v;
+      o(this, L, Math.abs(y) < h && Math.abs(w - s(this, O)) < h), o(this, p, s(this, L) ? s(this, O) : w), o(this, N, y), s(this, L) ? (o(this, p, s(this, O)), u && u(s(this, p))) : m && m(s(this, p));
     });
     o(this, p, e || 0), o(this, se, e || 0), o(this, T, { ...s(this, T), ...t });
   }

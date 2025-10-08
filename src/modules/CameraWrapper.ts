@@ -69,7 +69,7 @@ export default class CameraWrapper<T extends Controls> {
 		this.instance.getWorldScale(this.uniforms.cameraScale.value);
 		this.instance.getWorldQuaternion(this.uniforms.cameraQuaternion.value);
 		// this.instance.getWorldPosition(this.uniforms.cameraPosition.value); // usually not needed
-		if (this.#controls) this.#controls.update(deltaTime);
+		if (this.#controls && this.#controls.enabled) this.#controls.update(deltaTime);
 	};
 
 	clear = () => {
