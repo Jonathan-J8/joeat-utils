@@ -38,7 +38,7 @@
 	"module": "dist/index.es.js",
 	"name": "joeat-utils",
 	"type": "module",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"private": false,
 	"scripts": {
 		"build": "NODE_ENV=production tsc && vite build && node ./postbuild.config.cjs",
