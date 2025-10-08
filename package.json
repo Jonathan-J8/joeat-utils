@@ -1,0 +1,20 @@
+{
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.es.js",
+      "require": "./index.cjs.js"
+    }
+  },
+  "author": {
+    "name": "Jonathan-J8",
+    "email": "hello@joeat.xyz"
+  },
+  "types": "index.d.ts",
+  "main": "index.cjs.js",
+  "module": "index.es.js",
+  "name": "joeat-utils",
+  "type": "module",
+  "version": "1.0.2",
+  "private": false
+}
