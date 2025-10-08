@@ -7,32 +7,38 @@ import type {
 } from 'three/examples/jsm/Addons.js';
 import type { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
-type Controls = OrbitControls | FlyControls | ArcballControls | DragControls;
-
 type Uniforms = {
-	uDirection: { value: Three.Vector3 };
+	cameraDirection: { value: Three.Vector3 };
+	cameraScale: { value: Three.Vector3 };
+	cameraQuaternion: { value: Three.Quaternion };
 };
 
-export default class CameraWrapper {
+type Controls = OrbitControls | FlyControls | ArcballControls | DragControls;
+
+export default class CameraWrapper<T extends Controls> {
 	uniforms: Uniforms;
 	direction: Three.Vector3 | undefined;
 	instance: Three.PerspectiveCamera | Three.OrthographicCamera;
-	#controls: Controls | undefined;
+	#controls: T | undefined;
 
 	constructor({
 		instance,
 		controls,
 		Vector3,
+		Quaternion,
 	}: {
 		instance: Three.PerspectiveCamera | Three.OrthographicCamera;
-		controls?: Controls;
+		controls?: T;
 		Vector3: typeof Three.Vector3;
+		Quaternion: typeof Three.Quaternion;
 	}) {
 		this.uniforms = Object.freeze({
-			uDirection: { value: new Vector3() },
+			cameraDirection: { value: new Vector3() },
+			cameraScale: { value: new Vector3() },
+			cameraQuaternion: { value: new Quaternion() },
 		});
 		this.instance = instance;
-		this.#controls = controls;
+		if (controls) this.#controls = controls;
 		// if (!this.controls) return;
 		// this.controls.addEventListener('change', () => {
 		// 	const { uDirection } = this.uniforms;
@@ -40,7 +46,7 @@ export default class CameraWrapper {
 		// });
 	}
 
-	get controls(): Controls {
+	get controls(): T {
 		if (!this.#controls) throw new Error('Controls not initialized');
 		return this.#controls;
 	}
@@ -59,7 +65,10 @@ export default class CameraWrapper {
 	};
 
 	update = ({ deltaTime }: { deltaTime: number }) => {
-		this.instance.getWorldDirection(this.uniforms.uDirection.value);
+		this.instance.getWorldDirection(this.uniforms.cameraDirection.value);
+		this.instance.getWorldScale(this.uniforms.cameraScale.value);
+		this.instance.getWorldQuaternion(this.uniforms.cameraQuaternion.value);
+		// this.instance.getWorldPosition(this.uniforms.cameraPosition.value); // usually not needed
 		if (this.#controls) this.#controls.update(deltaTime);
 	};
 
@@ -72,34 +81,23 @@ export default class CameraWrapper {
 	};
 
 	debug = (gui: GUI) => {
-		if (this.#controls) gui.add(this.#controls, 'enabled').name('camera controls');
+		if (this.#controls)
+			gui
+				.add({ enabled: this.#controls.enabled }, 'enabled')
+				.name('camera controls')
+				.onChange((v) => {
+					if (!this.#controls) return;
+					this.#controls.enabled = v;
+				});
 
-		const { instance, direction } = this;
+		const { instance } = this;
+
 		gui.add(instance.position, 'x').name('camera position x').listen();
 		gui.add(instance.position, 'y').name('camera position y').listen();
 		gui.add(instance.position, 'z').name('camera position z').listen();
 
-		if (!direction) return;
-		gui
-			.add(direction, 'x')
-			.name('camera direction x')
-			.onChange(() => {
-				instance.lookAt(direction);
-			})
-			.listen();
-		gui
-			.add(direction, 'y')
-			.name('camera direction y')
-			.onChange(() => {
-				instance.lookAt(direction);
-			})
-			.listen();
-		gui
-			.add(direction, 'z')
-			.name('camera direction z')
-			.onChange(() => {
-				instance.lookAt(direction);
-			})
-			.listen();
+		gui.add(this.uniforms.cameraDirection.value, 'x').name('camera direction x').disable().listen();
+		gui.add(this.uniforms.cameraDirection.value, 'y').name('camera direction y').disable().listen();
+		gui.add(this.uniforms.cameraDirection.value, 'z').name('camera direction z').disable().listen();
 	};
 }

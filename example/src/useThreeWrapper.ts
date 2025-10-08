@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Scene, Vector2, Vector3, WebGLRenderer } from 'three';
+import { PerspectiveCamera, Quaternion, Scene, Vector2, Vector3, WebGLRenderer } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import GUI from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { Animator, CameraWrapper, RendererWrapper, Resizer, SceneWrapper } from '../../src';
@@ -19,14 +19,16 @@ const camera = new CameraWrapper({
 	instance: threeCamera,
 	controls: threeControls,
 	Vector3,
+	Quaternion,
 });
 
 camera.instance.position.z = 5;
 scene.instance.add(camera.instance);
 resizer.addListener(camera.resize, renderer.resize);
 resizer.fire();
-animator.addListener(() => {
-	renderer.update(scene.instance, camera.instance, animator.uniforms.uDeltaTime.value);
+animator.addListener(({ deltaTime }) => {
+	camera.update({ deltaTime });
+	renderer.update({ scene: scene.instance, camera: camera.instance, deltaTime });
 });
 animator.play(renderer.instance);
 

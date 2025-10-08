@@ -18,7 +18,11 @@ export default class GlRendererWrapper {
     });
     addEffect: (...pass: Pass[]) => void;
     removeEffect: (...pass: Pass[]) => void;
-    update: (scene: Three.Scene, camera: Three.Camera, delta?: number) => void;
+    update: (o: {
+        scene: Three.Scene;
+        camera: Three.Camera;
+        deltaTime?: number;
+    }) => void;
     resize: (o: {
         width: number;
         height: number;

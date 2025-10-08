@@ -48,11 +48,11 @@ export default class GlRendererWrapper {
 		});
 	};
 
-	update = (scene: Three.Scene, camera: Three.Camera, delta = 0.16) => {
+	update = (o: { scene: Three.Scene; camera: Three.Camera; deltaTime?: number }) => {
 		if (!this.instance) return;
 
-		if (this.composer) this.composer.render(delta);
-		else this.instance.render(scene, camera);
+		if (this.composer) this.composer.render(o.deltaTime || 0.016);
+		else this.instance.render(o.scene, o.camera);
 	};
 
 	resize = (o: { width: number; height: number; pixelRatio: number }) => {

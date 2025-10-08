@@ -175,7 +175,7 @@ describe('RendererWrapper', () => {
 	describe('update method', () => {
 		it('should render with composer when available', () => {
 			const deltaTime = 0.02;
-			rendererWrapper.update(mockScene, mockCamera, deltaTime);
+			rendererWrapper.update({ scene: mockScene, camera: mockCamera, deltaTime });
 
 			expect(mockComposer.render).toHaveBeenCalledWith(deltaTime);
 			expect(mockRenderer.render).not.toHaveBeenCalled();
@@ -187,22 +187,22 @@ describe('RendererWrapper', () => {
 				Vector2: mockVector2Class,
 			});
 
-			wrapperWithoutComposer.update(mockScene, mockCamera, 0.02);
+			wrapperWithoutComposer.update({ scene: mockScene, camera: mockCamera, deltaTime: 0.02 });
 
 			expect(mockRenderer.render).toHaveBeenCalledWith(mockScene, mockCamera);
 		});
 
 		it('should use default delta time', () => {
-			rendererWrapper.update(mockScene, mockCamera);
+			rendererWrapper.update({ scene: mockScene, camera: mockCamera });
 
-			expect(mockComposer.render).toHaveBeenCalledWith(0.16);
+			expect(mockComposer.render).toHaveBeenCalledWith(0.016);
 		});
 
 		it('should handle missing instance gracefully', () => {
 			// @ts-expect-error - Testing edge case
 			rendererWrapper.instance = null;
 
-			expect(() => rendererWrapper.update(mockScene, mockCamera)).not.toThrow();
+			expect(() => rendererWrapper.update({ scene: mockScene, camera: mockCamera })).not.toThrow();
 		});
 	});
 

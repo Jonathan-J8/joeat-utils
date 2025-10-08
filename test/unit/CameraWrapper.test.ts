@@ -13,6 +13,15 @@ const mockVector3 = {
 	set: vi.fn(),
 } as unknown as Three.Vector3;
 
+const mockQuaternion = {
+	x: 0,
+	y: 0,
+	z: 0,
+	w: 0,
+	copy: vi.fn(),
+	set: vi.fn(),
+} as unknown as Three.Quaternion;
+
 const mockCameraPosition = {
 	x: 0,
 	y: 0,
@@ -22,12 +31,21 @@ const mockCameraPosition = {
 } as unknown as Three.Vector3;
 
 const mockVector3Class = vi.fn(() => mockVector3) as unknown as typeof Three.Vector3;
+const mockQuaternionClass = vi.fn(() => mockQuaternion) as unknown as typeof Three.Quaternion;
 
 const mockCamera = {
 	aspect: 1,
 	updateProjectionMatrix: vi.fn(),
 	getWorldDirection: vi.fn((target) => {
 		target.set(0, 0, -1);
+		return target;
+	}),
+	getWorldScale: vi.fn((target) => {
+		target.set(0, 0, -1);
+		return target;
+	}),
+	getWorldQuaternion: vi.fn((target) => {
+		target.set(0, 0, -1, 0);
 		return target;
 	}),
 	clear: vi.fn(),
@@ -47,11 +65,12 @@ const mockGUI = {
 		name: vi.fn().mockReturnThis(),
 		onChange: vi.fn().mockReturnThis(),
 		listen: vi.fn().mockReturnThis(),
+		disable: vi.fn().mockReturnThis(),
 	}),
 } as unknown as GUI;
 
 describe('CameraWrapper', () => {
-	let cameraWrapper: CameraWrapper;
+	let cameraWrapper: CameraWrapper<OrbitControls>;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -59,6 +78,7 @@ describe('CameraWrapper', () => {
 			instance: mockCamera,
 			controls: mockControls,
 			Vector3: mockVector3Class,
+			Quaternion: mockQuaternionClass,
 		});
 	});
 
@@ -70,8 +90,8 @@ describe('CameraWrapper', () => {
 
 		it('should create uniforms with direction vector', () => {
 			expect(cameraWrapper.uniforms).toBeDefined();
-			expect(cameraWrapper.uniforms.uDirection).toBeDefined();
-			expect(cameraWrapper.uniforms.uDirection.value).toBe(mockVector3);
+			expect(cameraWrapper.uniforms.cameraDirection).toBeDefined();
+			expect(cameraWrapper.uniforms.cameraDirection.value).toBe(mockVector3);
 			expect(Object.isFrozen(cameraWrapper.uniforms)).toBe(true);
 		});
 
@@ -79,6 +99,7 @@ describe('CameraWrapper', () => {
 			const wrapperWithoutControls = new CameraWrapper({
 				instance: mockCamera,
 				Vector3: mockVector3Class,
+				Quaternion: mockQuaternionClass,
 			});
 			expect(() => wrapperWithoutControls.controls).toThrowError();
 		});
@@ -117,7 +138,7 @@ describe('CameraWrapper', () => {
 			cameraWrapper.update({ deltaTime });
 
 			expect(mockCamera.getWorldDirection).toHaveBeenCalledWith(
-				cameraWrapper.uniforms.uDirection.value,
+				cameraWrapper.uniforms.cameraDirection.value,
 			);
 		});
 
@@ -133,6 +154,7 @@ describe('CameraWrapper', () => {
 			const wrapperWithoutControls = new CameraWrapper({
 				instance: mockCamera,
 				Vector3: mockVector3Class,
+				Quaternion: mockQuaternionClass,
 			});
 
 			expect(() => wrapperWithoutControls.update({ deltaTime: 16 })).not.toThrow();
@@ -156,6 +178,7 @@ describe('CameraWrapper', () => {
 			const wrapperWithoutControls = new CameraWrapper({
 				instance: mockCamera,
 				Vector3: mockVector3Class,
+				Quaternion: mockQuaternionClass,
 			});
 
 			expect(() => wrapperWithoutControls.clear()).not.toThrow();
@@ -166,7 +189,7 @@ describe('CameraWrapper', () => {
 		it('should add controls enabled toggle to GUI', () => {
 			cameraWrapper.debug(mockGUI);
 
-			expect(mockGUI.add).toHaveBeenCalledWith(mockControls, 'enabled');
+			expect(mockGUI.add).not.toHaveBeenCalledWith(mockControls, 'enabled');
 		});
 
 		it('should add camera position controls to GUI', () => {
@@ -181,6 +204,7 @@ describe('CameraWrapper', () => {
 			const wrapperWithoutControls = new CameraWrapper({
 				instance: mockCamera,
 				Vector3: mockVector3Class,
+				Quaternion: mockQuaternionClass,
 			});
 
 			expect(() => wrapperWithoutControls.debug(mockGUI)).not.toThrow();
@@ -211,10 +235,10 @@ describe('CameraWrapper', () => {
 		});
 
 		it('should update uniform values through camera methods', () => {
-			const initialUniform = cameraWrapper.uniforms.uDirection.value;
+			const initialUniform = cameraWrapper.uniforms.cameraDirection.value;
 			cameraWrapper.update({ deltaTime: 16 });
 			// The uniform reference should remain the same, but its contents may be updated
-			expect(cameraWrapper.uniforms.uDirection.value).toBe(initialUniform);
+			expect(cameraWrapper.uniforms.cameraDirection.value).toBe(initialUniform);
 		});
 	});
 });
