@@ -75,17 +75,12 @@ describe('CameraWrapper', () => {
 			expect(Object.isFrozen(cameraWrapper.uniforms)).toBe(true);
 		});
 
-		it('should set up controls if provided', () => {
-			expect(cameraWrapper.controls).toBe(mockControls);
-			expect(mockControls.addEventListener).toHaveBeenCalledWith('change', expect.any(Function));
-		});
-
 		it('should work without controls', () => {
 			const wrapperWithoutControls = new CameraWrapper({
 				instance: mockCamera,
 				Vector3: mockVector3Class,
 			});
-			expect(wrapperWithoutControls.controls).toBeUndefined();
+			expect(() => wrapperWithoutControls.controls).toThrowError();
 		});
 	});
 

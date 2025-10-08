@@ -70,7 +70,7 @@ myEmitter.clear();
 ```
 
 ```typescript
-import { Animator, RendererWrapper, MousePointer } from 'joeat-utils';
+import { Animator, RendererWrapper, PointerTracker } from 'joeat-utils';
 import * as THREE from 'three';
 
 // Create renderer with post-processing support
@@ -88,14 +88,14 @@ animator.addListener(({ time, deltaTime }) => {
 
 // Add mouse interaction
 const camera = new THREE.PerspectiveCamera();
-const mousePointer = new MousePointer({
+const pointerTracker = new PointerTracker({
 	camera: camera,
 	Vector2: THREE.Vector2,
 	Vector3: THREE.Vector3,
 	Plane: THREE.Plane,
 	Raycaster: THREE.Raycaster,
 });
-mousePointer.init(renderer.domElement);
+pointerTracker.init(renderer.domElement);
 
 animator.play();
 ```
@@ -166,13 +166,13 @@ rendererWrapper.resize({
 });
 ```
 
-### MousePointer
+### PointerTracker
 
 Mouse/pointer interaction handling with coordinate normalization.
 
 ```typescript
 const camera = new THREE.PerspectiveCamera();
-const mousePointer = new MousePointer({
+const pointerTracker = new PointerTracker({
 	camera: camera,
 	Vector2: THREE.Vector2,
 	Vector3: THREE.Vector3,
@@ -181,16 +181,16 @@ const mousePointer = new MousePointer({
 });
 
 // Initialize with element
-mousePointer.init(canvas);
+pointerTracker.init(canvas);
 
 // Access normalized coordinates and world position
 const uniforms = {
-	uMousePosition: mousePointer.uniforms.uMousePosition, // [-1, 1]
-	uMouseWorldPosition: mousePointer.uniforms.uMouseWorldPosition, // World coordinates
-	uMouseVelocity: mousePointer.uniforms.uMouseVelocity,
-	uMousePress: mousePointer.uniforms.uMousePress, // Pointer pressure
-	uScroll: mousePointer.uniforms.uScroll,
-	uScrollVelocity: mousePointer.uniforms.uScrollVelocity,
+	uPointerPosition: pointerTracker.uniforms.uPointerPosition, // [-1, 1]
+	uPointerWorldPosition: pointerTracker.uniforms.uPointerWorldPosition, // World coordinates
+	uPointerPositionVelocity: pointerTracker.uniforms.uPointerPositionVelocity,
+	uPointerPress: pointerTracker.uniforms.uPointerPress, // Pointer pressure
+	uPointerScroll: pointerTracker.uniforms.uPointerScroll,
+	uPointerScrollVelocity: pointerTracker.uniforms.uPointerScrollVelocity,
 };
 ```
 
@@ -311,7 +311,7 @@ All wrapper classes provide uniforms for seamless GLSL integration:
 uniform float uTime;
 uniform vec2 uResolution;
 uniform vec2 uMouse;
-uniform vec2 uMouseVelocity;
+uniform vec2 uPointerPositionVelocity;
 uniform float uDeltaTime;
 
 void main() {

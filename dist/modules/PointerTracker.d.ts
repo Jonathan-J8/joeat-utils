@@ -1,26 +1,26 @@
 import { default as GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import type * as Three from 'three';
 type Uniforms = {
-    uScroll: {
+    uPointerScroll: {
         value: Three.Vector2;
     };
-    uScrollVelocity: {
+    uPointerScrollVelocity: {
         value: Three.Vector2;
     };
-    uMousePress: {
+    uPointerPress: {
         value: number;
     };
-    uMousePosition: {
+    uPointerPosition: {
         value: Three.Vector2;
     };
-    uMouseWorldPosition: {
+    uPointerWorldPosition: {
         value: Three.Vector3;
     };
-    uMouseVelocity: {
+    uPointerPositionVelocity: {
         value: Three.Vector2;
     };
 };
-declare class MousePointer {
+declare class PointerTracker {
     #private;
     uniforms: Uniforms;
     constructor({ Plane, Raycaster, Vector2, Vector3, camera, }: {
@@ -30,12 +30,14 @@ declare class MousePointer {
         Raycaster: typeof Three.Raycaster;
         camera: Three.Camera;
     });
-    onMove: (...callbacks: (() => void)[]) => void;
-    onPress: (...callbacks: (() => void)[]) => void;
-    onScroll: (...callbacks: (() => void)[]) => void;
-    init: (element: HTMLElement | Document | Window) => void;
-    clear: (element: HTMLElement | Document | Window) => void;
+    onMove: (e: Event) => void;
+    onScroll: (e: Event) => void;
+    onPress: (e: Event) => void;
+    addMoveListener: (...callbacks: (() => void)[]) => () => void;
+    addPressListener: (...callbacks: (() => void)[]) => () => void;
+    addScrollListener: (...callbacks: (() => void)[]) => () => void;
+    clear: () => void;
     debug: (gui: GUI) => void;
 }
-export default MousePointer;
-//# sourceMappingURL=MousePointer.d.ts.map
+export default PointerTracker;
+//# sourceMappingURL=PointerTracker.d.ts.map
