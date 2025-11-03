@@ -13,17 +13,39 @@ TypeScript library providing modular wrappers and utilities for Three.js and oth
 
 ## Installation
 
+### Latest Version
+
 ```bash
 npm install github:Jonathan-J8/joeat-utils#dist-only
 # or
 npx degit github:Jonathan-J8/joeat-utils#dist-only ./joeat-utils
 ```
 
+### Specific Version
+
+```bash
+# Install specific version (recommended for production)
+npm install github:Jonathan-J8/joeat-utils#v1.2.0
+
+# Using degit
+npx degit github:Jonathan-J8/joeat-utils#v1.2.0 ./joeat-utils
+```
+
+### In package.json
+
+```json
+{
+	"dependencies": {
+		"joeat-utils": "github:Jonathan-J8/joeat-utils#v1.2.0"
+	}
+}
+```
+
 ## Example
 
 Find the example [here](/example)
 
-### Run the exemple
+### Run the example
 
 ```bash
 npm run dev
@@ -61,7 +83,7 @@ const module = new ModuleName({
 ```typescript
 const myEmitter = new MonoEventEmitter<[{ someNumber: number }]>();
 const foo = ({ someNumber }) => {
-	// you logic
+	// your logic
 };
 myEmitter.addListener(foo);
 myEmitter.fire({ someNumber: 10 });
@@ -126,10 +148,10 @@ animator.interpolate({
 
 // Animation
 animator.animate({
-	steps = 0,
-	duration = 400,
-	delay = 100,
-	iterations = 1,
+	steps: 0,
+	duration: 400,
+	delay: 100,
+	iterations: 1,
 	onUpdate: () => {
 		// your animation logic
 	},
