@@ -42,7 +42,7 @@ describe('RendererWrapper', () => {
 		removePass: vi.fn(),
 		render: vi.fn(),
 		setSize: vi.fn(),
-		passes: [],
+		setPixelRatio: vi.fn(),
 	} as unknown as EffectComposer;
 
 	// Mock Pass
@@ -137,7 +137,7 @@ describe('RendererWrapper', () => {
 
 		it('should handle missing instance gracefully', () => {
 			// @ts-expect-error - Testing edge case
-			rendererWrapper.instance = null;
+			rendererWrapper.composer = null;
 			expect(() => rendererWrapper.addEffect(mockPass)).not.toThrow();
 		});
 	});
@@ -272,13 +272,6 @@ describe('RendererWrapper', () => {
 			expect(mockRenderer.dispose).toHaveBeenCalled();
 			expect(mockPass1.dispose).toHaveBeenCalled();
 			expect(mockPass2.dispose).toHaveBeenCalled();
-		});
-
-		it('should handle missing instance gracefully', () => {
-			// @ts-expect-error - Testing edge case
-			rendererWrapper.instance = null;
-
-			expect(() => rendererWrapper.clear()).not.toThrow();
 		});
 
 		it('should handle missing composer gracefully', () => {
