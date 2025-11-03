@@ -1,0 +1,1 @@
+{"version":3,"file":"createHub.d.ts","sourceRoot":"","sources":["../../src/modules/createHub.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,eAAe,IAAI,CAAC,EAAE,MAAM,OAAO,CAAC;AAGlD,QAAA,MAAM,SAAS,oBAAqB,OAAO,CAAC;YAElC;QAAE,KAAK,EAAE,MAAM,CAAC;QAAC,MAAM,EAAE,MAAM,CAAA;KAAE;YACjC,MAAM,IAAI;WACX,MAAM,IAAI;EASlB,CAAC;AAEF,eAAe,SAAS,CAAC"}
