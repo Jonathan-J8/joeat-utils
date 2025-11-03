@@ -34,6 +34,7 @@ const mockVector3Class = vi.fn(() => mockVector3) as unknown as typeof Three.Vec
 const mockQuaternionClass = vi.fn(() => mockQuaternion) as unknown as typeof Three.Quaternion;
 
 const mockPerspectiveCamera = {
+	type: 'PerspectiveCamera',
 	aspect: 1,
 	updateProjectionMatrix: vi.fn(),
 	getWorldDirection: vi.fn((target) => {
@@ -41,11 +42,11 @@ const mockPerspectiveCamera = {
 		return target;
 	}),
 	getWorldScale: vi.fn((target) => {
-		target.set(0, 0, -1);
+		target.set(1, 1, 1);
 		return target;
 	}),
 	getWorldQuaternion: vi.fn((target) => {
-		target.set(0, 0, -1, 0);
+		target.set(0, 0, 0, 1);
 		return target;
 	}),
 	clear: vi.fn(),
@@ -53,17 +54,22 @@ const mockPerspectiveCamera = {
 } as unknown as Three.PerspectiveCamera;
 
 const mockOrthographicCamera = {
+	type: 'OrthographicCamera',
+	top: 1,
+	bottom: -1,
+	left: -1,
+	right: 1,
 	updateProjectionMatrix: vi.fn(),
 	getWorldDirection: vi.fn((target) => {
 		target.set(0, 0, -1);
 		return target;
 	}),
 	getWorldScale: vi.fn((target) => {
-		target.set(0, 0, -1);
+		target.set(1, 1, 1);
 		return target;
 	}),
 	getWorldQuaternion: vi.fn((target) => {
-		target.set(0, 0, -1, 0);
+		target.set(0, 0, 0, 1);
 		return target;
 	}),
 	clear: vi.fn(),
@@ -71,11 +77,14 @@ const mockOrthographicCamera = {
 } as unknown as Three.OrthographicCamera;
 
 const mockControls = {
+	object: mockPerspectiveCamera,
 	addEventListener: vi.fn(),
 	update: vi.fn(),
 	disconnect: vi.fn(),
 	dispose: vi.fn(),
 	enabled: true,
+	enableDamping: false,
+	dampingFactor: 0.05,
 } as unknown as OrbitControls;
 
 const mockGUI = {
@@ -107,11 +116,32 @@ describe('CameraWrapper', () => {
 			expect(cameraWrapper.instance).toBe(mockPerspectiveCamera);
 		});
 
-		it('should create uniforms with direction vector', () => {
+		it('should create uniforms with all required vectors', () => {
 			expect(cameraWrapper.uniforms).toBeDefined();
 			expect(cameraWrapper.uniforms.cameraDirection).toBeDefined();
+			expect(cameraWrapper.uniforms.cameraScale).toBeDefined();
+			expect(cameraWrapper.uniforms.cameraQuaternion).toBeDefined();
 			expect(cameraWrapper.uniforms.cameraDirection.value).toBe(mockVector3);
+			expect(cameraWrapper.uniforms.cameraScale.value).toBe(mockVector3);
+			expect(cameraWrapper.uniforms.cameraQuaternion.value).toBe(mockQuaternion);
 			expect(Object.isFrozen(cameraWrapper.uniforms)).toBe(true);
+		});
+
+		it('should set camera based on controls object type', () => {
+			const orthographicControls = {
+				...mockControls,
+				object: mockOrthographicCamera,
+			} as unknown as OrbitControls;
+
+			const orthographicWrapper = new CameraWrapper({
+				perspective: mockPerspectiveCamera,
+				orthographic: mockOrthographicCamera,
+				controls: orthographicControls,
+				Vector3: mockVector3Class,
+				Quaternion: mockQuaternionClass,
+			});
+
+			expect(orthographicWrapper.instance).toBe(mockOrthographicCamera);
 		});
 	});
 
@@ -127,6 +157,20 @@ describe('CameraWrapper', () => {
 			expect(mockPerspectiveCamera.updateProjectionMatrix).toHaveBeenCalled();
 		});
 
+		it('should update orthographic camera bounds', () => {
+			const width = 800;
+			const height = 600;
+			const frustumHeight = mockOrthographicCamera.top - mockOrthographicCamera.bottom;
+			const expectedLeft = (frustumHeight * width) / height / -2;
+			const expectedRight = (frustumHeight * width) / height / 2;
+
+			cameraWrapper.resize({ width, height });
+
+			expect(mockOrthographicCamera.left).toBe(expectedLeft);
+			expect(mockOrthographicCamera.right).toBe(expectedRight);
+			expect(mockOrthographicCamera.updateProjectionMatrix).toHaveBeenCalled();
+		});
+
 		it('should handle different aspect ratios', () => {
 			cameraWrapper.resize({ width: 800, height: 600 });
 			expect(mockPerspectiveCamera.aspect).toBeCloseTo(1.333, 2);
@@ -135,14 +179,16 @@ describe('CameraWrapper', () => {
 			expect(mockPerspectiveCamera.aspect).toBeCloseTo(1.777, 2);
 		});
 
-		it('should always call updateProjectionMatrix', () => {
+		it('should always call updateProjectionMatrix for both cameras', () => {
+			vi.clearAllMocks();
 			cameraWrapper.resize({ width: 100, height: 100 });
 			expect(mockPerspectiveCamera.updateProjectionMatrix).toHaveBeenCalled();
+			expect(mockOrthographicCamera.updateProjectionMatrix).toHaveBeenCalled();
 		});
 	});
 
 	describe('update method', () => {
-		it('should update world direction uniform', () => {
+		it('should update all world uniforms', () => {
 			const deltaTime = 16;
 
 			cameraWrapper.update({ deltaTime });
@@ -150,21 +196,40 @@ describe('CameraWrapper', () => {
 			expect(mockPerspectiveCamera.getWorldDirection).toHaveBeenCalledWith(
 				cameraWrapper.uniforms.cameraDirection.value,
 			);
+			expect(mockPerspectiveCamera.getWorldScale).toHaveBeenCalledWith(
+				cameraWrapper.uniforms.cameraScale.value,
+			);
+			expect(mockPerspectiveCamera.getWorldQuaternion).toHaveBeenCalledWith(
+				cameraWrapper.uniforms.cameraQuaternion.value,
+			);
 		});
 
-		it('should update controls if available', () => {
+		it('should update controls if available and enabled', () => {
 			const deltaTime = 16;
 
 			cameraWrapper.update({ deltaTime });
 
 			expect(mockControls.update).toHaveBeenCalledWith(deltaTime);
 		});
+
+		it('should not update controls if disabled', () => {
+			const deltaTime = 16;
+			mockControls.enabled = false;
+
+			cameraWrapper.update({ deltaTime });
+
+			expect(mockControls.update).not.toHaveBeenCalled();
+
+			// Reset for other tests
+			mockControls.enabled = true;
+		});
 	});
 
 	describe('clear method', () => {
-		it('should clear camera', () => {
+		it('should clear all cameras', () => {
 			cameraWrapper.clear();
 			expect(mockPerspectiveCamera.clear).toHaveBeenCalled();
+			expect(mockOrthographicCamera.clear).toHaveBeenCalled();
 		});
 
 		it('should disconnect and dispose controls if available', () => {
@@ -176,10 +241,20 @@ describe('CameraWrapper', () => {
 	});
 
 	describe('debug method', () => {
+		beforeEach(() => {
+			vi.clearAllMocks();
+		});
+
 		it('should add controls enabled toggle to GUI', () => {
 			cameraWrapper.debug(mockGUI);
 
-			expect(mockGUI.add).not.toHaveBeenCalledWith(mockControls, 'enabled');
+			expect(mockGUI.add).toHaveBeenCalledWith({ enabled: mockControls.enabled }, 'enabled');
+		});
+
+		it('should add camera type toggle to GUI', () => {
+			cameraWrapper.debug(mockGUI);
+
+			expect(mockGUI.add).toHaveBeenCalledWith({ orthographic: false }, 'orthographic');
 		});
 
 		it('should add camera position controls to GUI', () => {
@@ -189,21 +264,70 @@ describe('CameraWrapper', () => {
 			expect(mockGUI.add).toHaveBeenCalledWith(mockCameraPosition, 'y');
 			expect(mockGUI.add).toHaveBeenCalledWith(mockCameraPosition, 'z');
 		});
+
+		it('should add camera direction controls to GUI (disabled)', () => {
+			cameraWrapper.debug(mockGUI);
+
+			expect(mockGUI.add).toHaveBeenCalledWith(cameraWrapper.uniforms.cameraDirection.value, 'x');
+			expect(mockGUI.add).toHaveBeenCalledWith(cameraWrapper.uniforms.cameraDirection.value, 'y');
+			expect(mockGUI.add).toHaveBeenCalledWith(cameraWrapper.uniforms.cameraDirection.value, 'z');
+		});
+
+		it('should add damping controls for OrbitControls', () => {
+			cameraWrapper.debug(mockGUI);
+
+			expect(mockGUI.add).toHaveBeenCalledWith(
+				{ enableDamping: mockControls.enableDamping },
+				'enableDamping',
+			);
+			expect(mockGUI.add).toHaveBeenCalledWith(
+				{ dampingFactor: mockControls.dampingFactor },
+				'dampingFactor',
+				0,
+				1,
+				0.01,
+			);
+		});
 	});
 
-	describe('properties', () => {
+	describe('instance property', () => {
 		it('should expose camera instance', () => {
 			expect(cameraWrapper.instance).toBe(mockPerspectiveCamera);
+		});
+
+		it('should switch to orthographic camera', () => {
+			cameraWrapper.instance = 'OrthographicCamera';
+			expect(cameraWrapper.instance).toBe(mockOrthographicCamera);
+			expect(mockControls.object).toBe(mockOrthographicCamera);
+		});
+
+		it('should switch to perspective camera', () => {
+			cameraWrapper.instance = 'OrthographicCamera';
+			cameraWrapper.instance = 'PerspectiveCamera';
+			expect(cameraWrapper.instance).toBe(mockPerspectiveCamera);
+			expect(mockControls.object).toBe(mockPerspectiveCamera);
+		});
+
+		it('should handle invalid camera type and default to perspective', () => {
+			const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+			// @ts-expect-error - Testing invalid input
+			cameraWrapper.instance = 'InvalidCamera';
+			expect(cameraWrapper.instance).toBe(mockPerspectiveCamera);
+			expect(consoleSpy).toHaveBeenCalledWith(
+				'Invalid camera type: use "OrthographicCamera" or "PerspectiveCamera". Falling back to "PerspectiveCamera"',
+			);
+
+			consoleSpy.mockRestore();
 		});
 
 		it('should expose controls', () => {
 			expect(cameraWrapper.controls).toBe(mockControls);
 		});
 
-		it('should allow setting direction', () => {
-			const newDirection = { x: 1, y: 1, z: 1 } as Three.Vector3;
-			cameraWrapper.direction = newDirection;
-			expect(cameraWrapper.direction).toBe(newDirection);
+		it('should expose perspective and orthographic cameras', () => {
+			expect(cameraWrapper.perspective).toBe(mockPerspectiveCamera);
+			expect(cameraWrapper.orthographic).toBe(mockOrthographicCamera);
 		});
 	});
 

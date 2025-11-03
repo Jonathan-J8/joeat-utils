@@ -8,7 +8,7 @@ TypeScript library providing modular wrappers and utilities for Three.js and oth
 - 🔧 **Dependency Injection**: Accept Three.js classes as parameters for optimal tree-shaking
 - 📝 **Full TypeScript Support**: Strict typing with comprehensive type definitions
 - 🎨 **Shader Integration**: Built-in uniforms system for seamless GLSL integration
-- 🧪 **Thoroughly Tested**: 180+ unit tests with 95%+ coverage across all modules
+- 🧪 **Thoroughly Tested**: 184+ unit tests with 95%+ coverage across all modules
 - 📦 **Multiple Formats**: ES modules, CommonJS, and UMD builds available
 
 ## Installation
@@ -25,10 +25,10 @@ npx degit github:Jonathan-J8/joeat-utils#dist-only ./joeat-utils
 
 ```bash
 # Install specific version (recommended for production)
-npm install github:Jonathan-J8/joeat-utils#v1.2.0
+npm install github:Jonathan-J8/joeat-utils#v1.2.2
 
 # Using degit
-npx degit github:Jonathan-J8/joeat-utils#v1.2.0 ./joeat-utils
+npx degit github:Jonathan-J8/joeat-utils#v1.2.2 ./joeat-utils
 ```
 
 ### In package.json
@@ -36,7 +36,7 @@ npx degit github:Jonathan-J8/joeat-utils#v1.2.0 ./joeat-utils
 ```json
 {
 	"dependencies": {
-		"joeat-utils": "github:Jonathan-J8/joeat-utils#v1.2.0"
+		"joeat-utils": "github:Jonathan-J8/joeat-utils#v1.2.2"
 	}
 }
 ```
@@ -92,8 +92,9 @@ myEmitter.clear();
 ```
 
 ```typescript
-import { Animator, RendererWrapper, PointerTracker } from '../../src';
+import { Animator, RendererWrapper, PointerTracker, CameraWrapper } from '../../src';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // Create renderer with post-processing support
 const renderer = new THREE.WebGLRenderer();
@@ -102,22 +103,44 @@ const rendererWrapper = new RendererWrapper({
 	Vector2: THREE.Vector2,
 });
 
+// Set up cameras with controls
+const perspectiveCamera = new THREE.PerspectiveCamera(75, 2, 0.1, 1000);
+const orthographicCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
+const controls = new OrbitControls(perspectiveCamera, renderer.domElement);
+
+const cameraWrapper = new CameraWrapper({
+	perspective: perspectiveCamera,
+	orthographic: orthographicCamera,
+	controls: controls,
+	Vector3: THREE.Vector3,
+	Quaternion: THREE.Quaternion,
+});
+
 // Set up animation loop
 const animator = new Animator();
 animator.addListener(({ time, deltaTime }) => {
-	rendererWrapper.update(scene, camera, deltaTime);
+	cameraWrapper.update({ deltaTime });
+	rendererWrapper.update(scene, cameraWrapper.instance, deltaTime);
 });
 
 // Add mouse interaction
-const camera = new THREE.PerspectiveCamera();
 const pointerTracker = new PointerTracker({
-	camera: camera,
+	camera: cameraWrapper.instance,
 	Vector2: THREE.Vector2,
 	Vector3: THREE.Vector3,
 	Plane: THREE.Plane,
 	Raycaster: THREE.Raycaster,
 });
 pointerTracker.init(renderer.domElement);
+
+// Handle resize
+window.addEventListener('resize', () => {
+	const width = window.innerWidth;
+	const height = window.innerHeight;
+
+	cameraWrapper.resize({ width, height });
+	rendererWrapper.resize({ width, height, pixelRatio: window.devicePixelRatio });
+});
 
 animator.play();
 ```
@@ -237,29 +260,58 @@ resizer.maxSize = 2048; // Limit maximum dimensions
 
 ### CameraWrapper
 
-Camera management with controls integration and directional uniforms.
+Advanced camera management with dual-camera system, controls integration, and comprehensive shader uniforms.
 
 ```typescript
-const camera = new THREE.PerspectiveCamera(75, 2, 0.1, 1000);
-const controls = new OrbitControls(camera, canvas);
+const perspectiveCamera = new THREE.PerspectiveCamera(75, 2, 0.1, 1000);
+const orthographicCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
+const controls = new OrbitControls(perspectiveCamera, canvas);
 
 const cameraWrapper = new CameraWrapper({
-	instance: camera,
-	controls: controls, // Optional
+	perspective: perspectiveCamera,
+	orthographic: orthographicCamera,
+	controls: controls, // OrbitControls, FlyControls, ArcballControls, or DragControls
 	Vector3: THREE.Vector3,
+	Quaternion: THREE.Quaternion,
 });
 
-// Access uniforms for shaders
+// Access comprehensive uniforms for shaders
 const uniforms = {
-	uDirection: cameraWrapper.uniforms.uDirection, // Camera world direction
+	uCameraDirection: cameraWrapper.uniforms.cameraDirection, // Camera world direction
+	uCameraScale: cameraWrapper.uniforms.cameraScale, // Camera world scale
+	uCameraQuaternion: cameraWrapper.uniforms.cameraQuaternion, // Camera world rotation
 };
 
-// Handle resize
-cameraWrapper.resize({ width: window.innerWidth, height: window.innerHeight });
+// Switch between camera types at runtime
+// default cameraWrapper.instance === controls.object
+cameraWrapper.instance = 'OrthographicCamera'; // Switch to orthographic
+cameraWrapper.instance = 'PerspectiveCamera'; // Switch back to perspective
 
-// Update camera and controls
+// Handle resize (updates both cameras)
+cameraWrapper.resize({
+	width: window.innerWidth,
+	height: window.innerHeight,
+});
+
+// Update camera uniforms and controls
 cameraWrapper.update({ deltaTime: 0.016 });
+
+// Debug camera in lil-gui
+cameraWrapper.debug(gui); // Adds camera position, type toggle, and controls settings
+
+// Clean up resources
+cameraWrapper.clear(); // Disposes controls and clears cameras
 ```
+
+#### Camera Features
+
+- **Dual Camera System**: Seamlessly switch between perspective and orthographic cameras
+- **Controls Integration**: Support for OrbitControls, FlyControls, ArcballControls, and DragControls
+- **Smart Initialization**: Automatically detects initial camera type from controls object
+- **Comprehensive Uniforms**: Direction, scale, and quaternion vectors for advanced shader effects
+- **Responsive Design**: Handles both perspective aspect ratio and orthographic bounds calculation
+- **Debug Interface**: Runtime camera controls with position tracking and controls configuration
+- **Conditional Updates**: Controls only update when enabled, optimizing performance
 
 ### TaskQueue
 
@@ -330,11 +382,21 @@ animator.addListener(({ progress }) => {
 All wrapper classes provide uniforms for seamless GLSL integration:
 
 ```glsl
+// Time and rendering uniforms
 uniform float uTime;
+uniform float uDeltaTime;
 uniform vec2 uResolution;
+
+// Pointer interaction uniforms
 uniform vec2 uMouse;
 uniform vec2 uPointerPositionVelocity;
-uniform float uDeltaTime;
+uniform float uPointerPress;
+uniform vec2 uPointerScroll;
+
+// Camera uniforms (from CameraWrapper)
+uniform vec3 uCameraDirection;
+uniform vec3 uCameraScale;
+uniform vec4 uCameraQuaternion;
 
 void main() {
   vec2 uv = gl_FragCoord.xy / uResolution.xy;
@@ -345,7 +407,13 @@ void main() {
   // Mouse interaction
   float mouse = length(uv - uMouse * 0.5 + 0.5);
 
-  gl_FragColor = vec4(wave, mouse, 0.0, 1.0);
+  // Camera-based effects
+  float cameraInfluence = dot(uCameraDirection, vec3(0.0, 1.0, 0.0));
+
+  // Combine effects
+  vec3 color = vec3(wave, mouse, cameraInfluence);
+
+  gl_FragColor = vec4(color, 1.0);
 }
 ```
 

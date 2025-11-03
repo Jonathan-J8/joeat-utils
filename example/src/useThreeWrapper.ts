@@ -1,4 +1,5 @@
 import {
+	Color,
 	OrthographicCamera,
 	PerspectiveCamera,
 	Quaternion,
@@ -36,9 +37,22 @@ camera.perspective.position.z = 5;
 camera.orthographic.position.z = 5;
 camera.orthographic.zoom = 0.2;
 
+// Set scene background color to match CSS (black)
+threeScene.background = new Color(0x000000);
+
 scene.instance.add(camera.instance);
-resizer.addListener(camera.resize, renderer.resize);
+
+// Handle resize with immediate render to prevent flicker
+const handleResize = (resizeData: { width: number; height: number; pixelRatio: number }) => {
+	camera.resize({ width: resizeData.width, height: resizeData.height });
+	renderer.resize(resizeData);
+	// Immediate render to prevent background color flash
+	renderer.update({ scene: scene.instance, camera: camera.instance });
+};
+
+resizer.addListener(handleResize);
 resizer.fire();
+
 animator.addListener(({ deltaTime }) => {
 	camera.update({ deltaTime });
 	renderer.update({ scene: scene.instance, camera: camera.instance, deltaTime });

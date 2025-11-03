@@ -26,7 +26,7 @@ const ze = (i) => {
   }, dispose: () => {
     e.geometry.dispose(), e.material.dispose();
   } };
-}, Ee = (i) => new i(new Uint8Array(1), 1, 1), Ie = (i) => -1 * Math.cos(i * (Math.PI / 2)) + 1, Ce = (i) => Math.sin(i * (Math.PI / 2)), Fe = (i) => -0.5 * (Math.cos(Math.PI * i) - 1), Oe = (i) => i * i, Le = (i) => i * (2 - i), De = (i) => i < 0.5 ? 2 * i * i : -1 + (4 - 2 * i) * i, We = (i) => i * i * i, ke = (i) => {
+}, Ee = (i) => new i(new Uint8Array(1), 1, 1), Ce = (i) => -1 * Math.cos(i * (Math.PI / 2)) + 1, Ie = (i) => Math.sin(i * (Math.PI / 2)), Fe = (i) => -0.5 * (Math.cos(Math.PI * i) - 1), Oe = (i) => i * i, Le = (i) => i * (2 - i), De = (i) => i < 0.5 ? 2 * i * i : -1 + (4 - 2 * i) * i, We = (i) => i * i * i, ke = (i) => {
   const e = i - 1;
   return e * e * e + 1;
 }, Re = (i) => i < 0.5 ? 4 * i * i * i : (i - 1) * (2 * i - 2) * (2 * i - 2) + 1, Qe = (i) => i * i * i * i, Ae = (i) => {
@@ -164,12 +164,12 @@ class rt extends ne {
       to: n = 1,
       onStart: r,
       onUpdate: c,
-      onComplete: u
+      onComplete: l
     }) => {
-      const p = Math.abs(t), g = Math.abs(n), d = t < n ? 1 : -1;
-      let l = p;
+      const m = Math.abs(t), g = Math.abs(n), d = t < n ? 1 : -1;
+      let p = m;
       const w = (y) => {
-        l += y.deltaTime, l = ce(l, p, g), typeof c == "function" && c({ value: l * d, ...y }), l === g && (typeof u == "function" && u({ value: l * d, ...y }), this.removeListener(w));
+        p += y.deltaTime, p = ce(p, m, g), typeof c == "function" && c({ value: p * d, ...y }), p === g && (typeof l == "function" && l({ value: p * d, ...y }), this.removeListener(w));
       }, { uDeltaMs: x, uDeltaTime: M, uTime: v } = this.uniforms;
       typeof r == "function" && r({
         value: t,
@@ -183,22 +183,22 @@ class rt extends ne {
       duration: n = 400,
       delay: r = 0,
       iterations: c = 0,
-      onStart: u,
-      onUpdate: p,
+      onStart: l,
+      onUpdate: m,
       onComplete: g
     }) => {
-      let d, l = 0, w = 0, x = 0;
+      let d, p = 0, w = 0, x = 0;
       const M = ({ time: y }) => {
-        const ae = Math.abs(y - l);
+        const ae = Math.abs(y - p);
         if (t > 0) {
           const de = Math.min(Math.floor(ae / n * t), t - 1);
-          de !== w && (w = de, X(p));
-        } else X(p);
-        ae >= n && (this.removeListener(M), X(p), X(g), x++, (c < 0 || c === 1 / 0 || x < c) && (typeof d == "number" && clearTimeout(d), r > 0 ? d = setTimeout(() => {
-          l = me(), X(u), this.addListener(M);
+          de !== w && (w = de, X(m));
+        } else X(m);
+        ae >= n && (this.removeListener(M), X(m), X(g), x++, (c < 0 || c === 1 / 0 || x < c) && (typeof d == "number" && clearTimeout(d), r > 0 ? d = setTimeout(() => {
+          p = me(), X(l), this.addListener(M);
         }, r) : v()));
       }, v = () => {
-        l = me(), X(u), this.addListener(M);
+        p = me(), X(l), this.addListener(M);
       };
       return typeof d == "number" && clearTimeout(d), r > 0 ? d = setTimeout(v, r) : v(), () => this.removeListener(M);
     });
@@ -208,9 +208,8 @@ class rt extends ne {
   }
 }
 Q = new WeakMap(), A = new WeakMap(), Y = new WeakMap(), $ = new WeakMap(), G = new WeakMap();
-var m;
+var u;
 class ot {
-  // dispatcher = new MonoEventEmitter();
   constructor({
     perspective: e,
     orthographic: t,
@@ -219,8 +218,7 @@ class ot {
     Quaternion: c
   }) {
     a(this, "uniforms");
-    a(this, "direction");
-    h(this, m);
+    h(this, u);
     a(this, "perspective");
     a(this, "orthographic");
     a(this, "controls");
@@ -233,7 +231,7 @@ class ot {
       this.orthographic.left = n * e / t / -2, this.orthographic.right = n * e / t / 2, this.orthographic.updateProjectionMatrix();
     });
     a(this, "update", ({ deltaTime: e }) => {
-      this.instance.getWorldDirection(this.uniforms.cameraDirection.value), this.instance.getWorldScale(this.uniforms.cameraScale.value), this.instance.getWorldQuaternion(this.uniforms.cameraQuaternion.value), this.controls && this.controls.enabled && this.controls.update(e);
+      s(this, u).getWorldDirection(this.uniforms.cameraDirection.value), s(this, u).getWorldScale(this.uniforms.cameraScale.value), s(this, u).getWorldQuaternion(this.uniforms.cameraQuaternion.value), this.controls && this.controls.enabled && this.controls.update(e);
     });
     a(this, "clear", () => {
       this.perspective.clear(), this.orthographic.clear(), this.instance.clear(), this.controls.disconnect(), this.controls.dispose();
@@ -245,30 +243,30 @@ class ot {
         "enableDamping" in this.controls && (this.controls.enableDamping = t);
       }), "dampingFactor" in this.controls && e.add({ dampingFactor: this.controls.dampingFactor }, "dampingFactor", 0, 1, 0.01).name("controls damping factor").onChange((t) => {
         "dampingFactor" in this.controls && (this.controls.dampingFactor = t);
-      }), e.add({ orthographic: s(this, m).type === "OrthographicCamera" }, "orthographic").name("orthographic camera").onChange((t) => {
+      }), e.add({ orthographic: s(this, u).type === "OrthographicCamera" }, "orthographic").name("orthographic camera").onChange((t) => {
         this.instance = t ? "OrthographicCamera" : "PerspectiveCamera";
-      }), e.add(s(this, m).position, "x").name("camera position x").listen(), e.add(s(this, m).position, "y").name("camera position y").listen(), e.add(s(this, m).position, "z").name("camera position z").listen(), e.add(this.uniforms.cameraDirection.value, "x").name("camera direction x").disable().listen(), e.add(this.uniforms.cameraDirection.value, "y").name("camera direction y").disable().listen(), e.add(this.uniforms.cameraDirection.value, "z").name("camera direction z").disable().listen();
+      }), e.add(s(this, u).position, "x").name("camera position x").listen(), e.add(s(this, u).position, "y").name("camera position y").listen(), e.add(s(this, u).position, "z").name("camera position z").listen(), e.add(this.uniforms.cameraDirection.value, "x").name("camera direction x").disable().listen(), e.add(this.uniforms.cameraDirection.value, "y").name("camera direction y").disable().listen(), e.add(this.uniforms.cameraDirection.value, "z").name("camera direction z").disable().listen();
     });
     this.uniforms = Object.freeze({
       cameraDirection: { value: new r() },
       cameraScale: { value: new r() },
       cameraQuaternion: { value: new c() }
-    }), this.controls = n, this.perspective = e, this.orthographic = t, o(this, m, this.perspective);
+    }), this.controls = n, this.perspective = e, this.orthographic = t, o(this, u, n.object.type === "OrthographicCamera" ? this.orthographic : this.perspective);
   }
   set instance(e) {
-    if (e === "OrthographicCamera" && s(this, m).type !== "OrthographicCamera") {
-      o(this, m, this.orthographic), this.controls.object = s(this, m);
+    if (e === "OrthographicCamera" && s(this, u).type !== "OrthographicCamera") {
+      o(this, u, this.orthographic), this.controls.object = s(this, u);
       return;
     }
-    s(this, m).type !== "PerspectiveCamera" && (o(this, m, this.perspective), this.controls.object = s(this, m)), e !== "OrthographicCamera" && e !== "PerspectiveCamera" && console.warn(
+    s(this, u).type !== "PerspectiveCamera" && (o(this, u, this.perspective), this.controls.object = s(this, u)), e !== "OrthographicCamera" && e !== "PerspectiveCamera" && console.warn(
       'Invalid camera type: use "OrthographicCamera" or "PerspectiveCamera". Falling back to "PerspectiveCamera"'
     );
   }
   get instance() {
-    return s(this, m);
+    return s(this, u);
   }
 }
-m = new WeakMap();
+u = new WeakMap();
 var re, U, J, K, j, S, E, oe, Z, _, P, B, V, q, ee, he, ue, le;
 class at {
   constructor({
@@ -313,16 +311,16 @@ class at {
       if (n instanceof HTMLCanvasElement)
         r = n.width, c = n.height;
       else if (n instanceof HTMLElement) {
-        const { width: p, height: g } = n.getBoundingClientRect();
-        r = p, c = g;
+        const { width: m, height: g } = n.getBoundingClientRect();
+        r = m, c = g;
       } else
         r = window.innerWidth, c = window.innerHeight;
-      const { uPointerPosition: u } = this.uniforms;
-      u.value.x = t.clientX / r * 2 - 1, u.value.y = -(t.clientY / c) * 2 + 1;
+      const { uPointerPosition: l } = this.uniforms;
+      l.value.x = t.clientX / r * 2 - 1, l.value.y = -(t.clientY / c) * 2 + 1;
     });
     h(this, ue, (e) => {
-      const t = e, { uPointerPositionVelocity: n } = this.uniforms, r = t.pageX, c = t.pageY, u = s(this, j).x, p = s(this, j).y;
-      n.value.x = Math.abs(r - u), n.value.y = Math.abs(c - p), s(this, j).set(r, c), typeof s(this, S) == "number" && clearTimeout(s(this, S)), o(this, S, setTimeout(() => {
+      const t = e, { uPointerPositionVelocity: n } = this.uniforms, r = t.pageX, c = t.pageY, l = s(this, j).x, m = s(this, j).y;
+      n.value.x = Math.abs(r - l), n.value.y = Math.abs(c - m), s(this, j).set(r, c), typeof s(this, S) == "number" && clearTimeout(s(this, S)), o(this, S, setTimeout(() => {
         n.value.set(0, 0);
       }, s(this, oe)));
     });
@@ -346,22 +344,6 @@ class at {
     a(this, "addMoveListener", (...e) => (s(this, B).addListener(...e), () => s(this, B).removeListener(...e)));
     a(this, "addPressListener", (...e) => (s(this, V).addListener(...e), () => s(this, V).removeListener(...e)));
     a(this, "addScrollListener", (...e) => (s(this, q).addListener(...e), () => s(this, q).removeListener(...e)));
-    // init = (element: HTMLElement | Document | Window) => {
-    // 	element.addEventListener('pointermove', this.#updateMouseMove, false);
-    // 	element.addEventListener('pointerout', this.#updateMouseMove, false);
-    // 	element.addEventListener('pointerdown', this.#updateMousePress, false);
-    // 	element.addEventListener('pointerup', this.#updateMousePress, false);
-    // 	window.addEventListener('scroll', this.#updateScroll, false);
-    // 	window.addEventListener('scrollend', this.#updateScroll, false);
-    // return ()=>{
-    // 	// element.removeEventListener('pointermove', this.#updateMouseMove, false);
-    // 	// element.removeEventListener('pointerout', this.#updateMouseMove, false);
-    // 	// element.removeEventListener('pointerdown', this.#updateMousePress, false);
-    // 	// element.removeEventListener('pointerup', this.#updateMousePress, false);
-    // 	// window.removeEventListener('scroll', this.#updateScroll, false);
-    // 	// window.removeEventListener('scrollend', this.#updateScroll, false);
-    // }
-    // };
     a(this, "clear", () => {
       var e;
       s(this, B).clear(), s(this, V).clear(), s(this, q).clear(), s(this, S) && clearTimeout(s(this, S)), o(this, S, void 0), s(this, E) && clearTimeout(s(this, E)), o(this, E, void 0), (e = s(this, P)) == null || e.remove(), o(this, P, void 0);
@@ -381,13 +363,13 @@ class at {
 }
 re = new WeakMap(), U = new WeakMap(), J = new WeakMap(), K = new WeakMap(), j = new WeakMap(), S = new WeakMap(), E = new WeakMap(), oe = new WeakMap(), Z = new WeakMap(), _ = new WeakMap(), P = new WeakMap(), B = new WeakMap(), V = new WeakMap(), q = new WeakMap(), ee = new WeakMap(), he = new WeakMap(), ue = new WeakMap(), le = new WeakMap();
 const Te = function(i, e, t, n) {
-  const r = function(c, u, p) {
-    var l, w;
-    const g = (l = c.getShaderInfoLog(u)) == null ? void 0 : l.trim(), d = "Errors in " + p + `:
+  const r = function(c, l, m) {
+    var p, w;
+    const g = (p = c.getShaderInfoLog(l)) == null ? void 0 : p.trim(), d = "Errors in " + m + `:
 
 ` + g;
     if (g !== "") {
-      const x = (w = c.getShaderSource(u)) == null ? void 0 : w.replace(/\t/g, "  "), M = x == null ? void 0 : x.split(`
+      const x = (w = c.getShaderSource(l)) == null ? void 0 : w.replace(/\t/g, "  "), M = x == null ? void 0 : x.split(`
 `);
       let v = "", y = 1;
       if (!M) return;
@@ -449,28 +431,28 @@ class ct {
     }), this.instance = e, this.instance.debug.checkShaderErrors = !1, n && (this.composer = new n(this.instance));
   }
 }
-var I, D, W, te, C, k, ie;
+var C, D, W, te, I, k, ie;
 class ht extends ne {
   constructor(t) {
     super();
-    h(this, I, 7680);
+    h(this, C, 7680);
     // 4k
     h(this, D, 1280);
     h(this, W, 720);
     h(this, te, 1);
-    h(this, C, 1);
+    h(this, I, 1);
     h(this, k);
     a(this, "fire", () => {
       let t = s(this, D), n = s(this, W);
-      if (s(this, D) > s(this, I) || s(this, W) > s(this, I))
+      if (s(this, D) > s(this, C) || s(this, W) > s(this, C))
         if (t > n) {
           const c = n / t;
-          t = ce(t, 0, s(this, I)), n = t * c;
+          t = ce(t, 0, s(this, C)), n = t * c;
         } else {
           const c = t / n;
-          n = ce(n, 0, s(this, I)), t = n * c;
+          n = ce(n, 0, s(this, C)), t = n * c;
         }
-      t *= s(this, C), n *= s(this, C);
+      t *= s(this, I), n *= s(this, I);
       const r = s(this, te);
       super.fire({ width: t, height: n, pixelRatio: r });
     });
@@ -488,10 +470,10 @@ class ht extends ne {
     o(this, te, Math.min(window.devicePixelRatio, 2)), o(this, k, t), s(this, ie).observe(s(this, k)), this.fire();
   }
   get width() {
-    return s(this, D) * s(this, C);
+    return s(this, D) * s(this, I);
   }
   get height() {
-    return s(this, W) * s(this, C);
+    return s(this, W) * s(this, I);
   }
   get element() {
     return s(this, k);
@@ -500,22 +482,22 @@ class ht extends ne {
     return s(this, te);
   }
   get maxSize() {
-    return s(this, I);
-  }
-  get resolutionFactor() {
     return s(this, C);
   }
+  get resolutionFactor() {
+    return s(this, I);
+  }
   set resolutionFactor(t) {
-    o(this, C, ce(t, 0.01, 1)), this.fire();
+    o(this, I, ce(t, 0.01, 1)), this.fire();
   }
   set maxSize(t) {
-    o(this, I, t < 32 ? 32 : t), this.fire();
+    o(this, C, t < 32 ? 32 : t), this.fire();
   }
   clear() {
     super.clear(), s(this, k) && s(this, ie).unobserve(s(this, k)), s(this, ie).disconnect();
   }
 }
-I = new WeakMap(), D = new WeakMap(), W = new WeakMap(), te = new WeakMap(), C = new WeakMap(), k = new WeakMap(), ie = new WeakMap();
+C = new WeakMap(), D = new WeakMap(), W = new WeakMap(), te = new WeakMap(), I = new WeakMap(), k = new WeakMap(), ie = new WeakMap();
 const L = class L {
   constructor({ instance: e }) {
     a(this, "instance");
@@ -557,8 +539,8 @@ class ut {
     a(this, "to", (e, t) => (o(this, F, e), Math.abs(s(this, H)) < s(this, T).threshold && Math.abs(s(this, F) - s(this, f)) < s(this, T).threshold ? this : (t && o(this, T, { ...s(this, T), ...t }), o(this, O, !1), this)));
     a(this, "update", (e = 0.016) => {
       if (s(this, O)) return;
-      const { mass: t, tension: n, friction: r, threshold: c, onComplete: u, onUpdate: p } = s(this, T), g = Math.min(e, 0.06), d = s(this, H) ?? 0, l = typeof s(this, f) == "number" ? s(this, f) : s(this, se), w = -1 * n * (l - s(this, F)), x = -1 * d * r, M = (w + x) / t, v = d + M * g, y = l + v * g;
-      o(this, O, Math.abs(v) < c && Math.abs(y - s(this, F)) < c), o(this, f, s(this, O) ? s(this, F) : y), o(this, H, v), s(this, O) ? (o(this, f, s(this, F)), u && u(s(this, f))) : p && p(s(this, f));
+      const { mass: t, tension: n, friction: r, threshold: c, onComplete: l, onUpdate: m } = s(this, T), g = Math.min(e, 0.06), d = s(this, H) ?? 0, p = typeof s(this, f) == "number" ? s(this, f) : s(this, se), w = -1 * n * (p - s(this, F)), x = -1 * d * r, M = (w + x) / t, v = d + M * g, y = p + v * g;
+      o(this, O, Math.abs(v) < c && Math.abs(y - s(this, F)) < c), o(this, f, s(this, O) ? s(this, F) : y), o(this, H, v), s(this, O) ? (o(this, f, s(this, F)), l && l(s(this, f))) : m && m(s(this, f));
     });
     o(this, f, e || 0), o(this, se, e || 0), o(this, T, { ...s(this, T), ...t });
   }
@@ -648,7 +630,7 @@ export {
   Oe as easeInQuad,
   Qe as easeInQuart,
   je as easeInQuint,
-  Ie as easeInSine,
+  Ce as easeInSine,
   Je as easeOutBack,
   ye as easeOutBounce,
   Ye as easeOutCirc,
@@ -658,7 +640,7 @@ export {
   Le as easeOutQuad,
   Ae as easeOutQuart,
   Be as easeOutQuint,
-  Ce as easeOutSine,
+  Ie as easeOutSine,
   it as isBetween,
   xe as lerp,
   me as now,

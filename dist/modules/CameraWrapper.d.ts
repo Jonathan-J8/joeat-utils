@@ -15,7 +15,6 @@ type Uniforms = {
 export default class CameraWrapper {
     #private;
     uniforms: Uniforms;
-    direction: Three.Vector3 | undefined;
     perspective: Three.PerspectiveCamera;
     orthographic: Three.OrthographicCamera;
     controls: OrbitControls | FlyControls | ArcballControls | DragControls;

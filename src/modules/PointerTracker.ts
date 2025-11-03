@@ -177,24 +177,6 @@ class PointerTracker {
 		return () => this.#scrollEmitter.removeListener(...callbacks);
 	};
 
-	// init = (element: HTMLElement | Document | Window) => {
-	// 	element.addEventListener('pointermove', this.#updateMouseMove, false);
-	// 	element.addEventListener('pointerout', this.#updateMouseMove, false);
-	// 	element.addEventListener('pointerdown', this.#updateMousePress, false);
-	// 	element.addEventListener('pointerup', this.#updateMousePress, false);
-	// 	window.addEventListener('scroll', this.#updateScroll, false);
-	// 	window.addEventListener('scrollend', this.#updateScroll, false);
-	// return ()=>{
-
-	// 	// element.removeEventListener('pointermove', this.#updateMouseMove, false);
-	// 	// element.removeEventListener('pointerout', this.#updateMouseMove, false);
-	// 	// element.removeEventListener('pointerdown', this.#updateMousePress, false);
-	// 	// element.removeEventListener('pointerup', this.#updateMousePress, false);
-	// 	// window.removeEventListener('scroll', this.#updateScroll, false);
-	// 	// window.removeEventListener('scrollend', this.#updateScroll, false);
-	// }
-	// };
-
 	clear = () => {
 		this.#moveEmitter.clear();
 		this.#pressEmitter.clear();

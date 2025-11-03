@@ -15,12 +15,10 @@ type Uniforms = {
 
 export default class CameraWrapper {
 	uniforms: Uniforms;
-	direction: Three.Vector3 | undefined;
 	#instance: Three.PerspectiveCamera | Three.OrthographicCamera;
 	perspective: Three.PerspectiveCamera;
 	orthographic: Three.OrthographicCamera;
 	controls: OrbitControls | FlyControls | ArcballControls | DragControls;
-	// dispatcher = new MonoEventEmitter();
 
 	constructor({
 		perspective,
@@ -45,7 +43,8 @@ export default class CameraWrapper {
 		this.controls = controls;
 		this.perspective = perspective;
 		this.orthographic = orthographic;
-		this.#instance = this.perspective;
+		this.#instance =
+			controls.object.type === 'OrthographicCamera' ? this.orthographic : this.perspective;
 	}
 
 	set instance(value: 'OrthographicCamera' | 'PerspectiveCamera') {
@@ -87,9 +86,9 @@ export default class CameraWrapper {
 	};
 
 	update = ({ deltaTime }: { deltaTime: number }) => {
-		this.instance.getWorldDirection(this.uniforms.cameraDirection.value);
-		this.instance.getWorldScale(this.uniforms.cameraScale.value);
-		this.instance.getWorldQuaternion(this.uniforms.cameraQuaternion.value);
+		this.#instance.getWorldDirection(this.uniforms.cameraDirection.value);
+		this.#instance.getWorldScale(this.uniforms.cameraScale.value);
+		this.#instance.getWorldQuaternion(this.uniforms.cameraQuaternion.value);
 		// this.instance.getWorldPosition(this.uniforms.cameraPosition.value); // usually not needed
 		if (this.controls && this.controls.enabled) this.controls.update(deltaTime);
 	};
