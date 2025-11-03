@@ -1,20 +1,20 @@
 {
+  "version": "1.2.0",
+  "name": "joeat-utils",
+  "types": "index.d.ts",
+  "main": "index.cjs.js",
+  "module": "index.es.js",
+  "type": "module",
+  "private": false,
+  "author": {
+    "name": "Jonathan-J8",
+    "email": "hello@joeat.xyz"
+  },
   "exports": {
     ".": {
       "types": "./index.d.ts",
       "import": "./index.es.js",
       "require": "./index.cjs.js"
     }
-  },
-  "author": {
-    "name": "Jonathan-J8",
-    "email": "hello@joeat.xyz"
-  },
-  "types": "index.d.ts",
-  "main": "index.cjs.js",
-  "module": "index.es.js",
-  "name": "joeat-utils",
-  "type": "module",
-  "version": "1.2.0",
-  "private": false
+  }
 }
