@@ -30,8 +30,6 @@ export default class GlRendererWrapper {
 
 		if (!EffectComposer) return;
 		this.composer = new EffectComposer(this.instance);
-		// const renderPass = new RenderPass(scene, camera);
-		// this.composer.addPass(renderPass);
 	}
 
 	addEffect = (...pass: Pass[]) => {
@@ -62,11 +60,14 @@ export default class GlRendererWrapper {
 		this.instance.setSize(width, height, false);
 		this.instance.setPixelRatio(pixelRatio);
 		this.uniforms.uResolution.value.set(width, height);
-		if (this.composer) this.composer.setSize(width, height);
+		if (this.composer) {
+			this.composer.setSize(width, height);
+			this.composer.setPixelRatio(pixelRatio);
+		}
 	};
 
 	clear = () => {
-		if (this.instance) this.instance.dispose();
+		this.instance.dispose();
 		if (this.composer) this.removeEffect(...this.composer.passes);
 	};
 

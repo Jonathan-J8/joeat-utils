@@ -408,10 +408,10 @@ class ct {
     });
     a(this, "resize", (e) => {
       const { width: t, height: n, pixelRatio: r } = e;
-      this.instance && (this.instance.setSize(t, n, !1), this.instance.setPixelRatio(r), this.uniforms.uResolution.value.set(t, n), this.composer && this.composer.setSize(t, n));
+      this.instance && (this.instance.setSize(t, n, !1), this.instance.setPixelRatio(r), this.uniforms.uResolution.value.set(t, n), this.composer && (this.composer.setSize(t, n), this.composer.setPixelRatio(r)));
     });
     a(this, "clear", () => {
-      this.instance && this.instance.dispose(), this.composer && this.removeEffect(...this.composer.passes);
+      this.instance.dispose(), this.composer && this.removeEffect(...this.composer.passes);
     });
     a(this, "debug", (e) => {
       const { instance: t } = this;
