@@ -1,5 +1,5 @@
-import { MonoEventEmitter } from 'joeat-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MonoEventEmitter } from '../../src';
 
 describe('MonoEventEmitter', () => {
 	let emitter: MonoEventEmitter<[string, number]>;

@@ -1,4 +1,12 @@
-import { PerspectiveCamera, Quaternion, Scene, Vector2, Vector3, WebGLRenderer } from 'three';
+import {
+	OrthographicCamera,
+	PerspectiveCamera,
+	Quaternion,
+	Scene,
+	Vector2,
+	Vector3,
+	WebGLRenderer,
+} from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import GUI from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { Animator, CameraWrapper, RendererWrapper, Resizer, SceneWrapper } from '../../src';
@@ -6,9 +14,10 @@ import { Animator, CameraWrapper, RendererWrapper, Resizer, SceneWrapper } from 
 // THREE
 const canvas = document.getElementById('three') as HTMLCanvasElement;
 const threeRenderer = new WebGLRenderer({ canvas });
-const threeCamera = new PerspectiveCamera(75, 2, 0.1, 1000);
+const threePerspectiveCamera = new PerspectiveCamera(75, 2, 0.1, 1000);
+const threeOrthographicCamera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
 const threeScene = new Scene();
-const threeControls = new OrbitControls(threeCamera, canvas);
+const threeControls = new OrbitControls(threePerspectiveCamera, canvas);
 
 // WRAPPERS & EMITTERS
 const animator = new Animator();
@@ -16,13 +25,17 @@ const resizer = new Resizer(canvas);
 const scene = new SceneWrapper({ instance: threeScene });
 const renderer = new RendererWrapper({ instance: threeRenderer, Vector2 });
 const camera = new CameraWrapper({
-	instance: threeCamera,
+	perspective: threePerspectiveCamera,
+	orthographic: threeOrthographicCamera,
 	controls: threeControls,
 	Vector3,
 	Quaternion,
 });
 
-camera.instance.position.z = 5;
+camera.perspective.position.z = 5;
+camera.orthographic.position.z = 5;
+camera.orthographic.zoom = 0.2;
+
 scene.instance.add(camera.instance);
 resizer.addListener(camera.resize, renderer.resize);
 resizer.fire();

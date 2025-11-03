@@ -1,5 +1,5 @@
-import { Spring } from 'joeat-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Spring } from '../../src';
 
 describe('Spring', () => {
 	let spring: Spring;

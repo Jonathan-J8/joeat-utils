@@ -1,8 +1,8 @@
-import { CameraWrapper } from 'joeat-utils';
 import type * as Three from 'three';
 import type { OrbitControls } from 'three/examples/jsm/Addons.js';
 import type { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { CameraWrapper } from '../../src';
 
 // Mock Three.js classes
 const mockVector3 = {
@@ -33,7 +33,7 @@ const mockCameraPosition = {
 const mockVector3Class = vi.fn(() => mockVector3) as unknown as typeof Three.Vector3;
 const mockQuaternionClass = vi.fn(() => mockQuaternion) as unknown as typeof Three.Quaternion;
 
-const mockCamera = {
+const mockPerspectiveCamera = {
 	aspect: 1,
 	updateProjectionMatrix: vi.fn(),
 	getWorldDirection: vi.fn((target) => {
@@ -51,6 +51,24 @@ const mockCamera = {
 	clear: vi.fn(),
 	position: mockCameraPosition,
 } as unknown as Three.PerspectiveCamera;
+
+const mockOrthographicCamera = {
+	updateProjectionMatrix: vi.fn(),
+	getWorldDirection: vi.fn((target) => {
+		target.set(0, 0, -1);
+		return target;
+	}),
+	getWorldScale: vi.fn((target) => {
+		target.set(0, 0, -1);
+		return target;
+	}),
+	getWorldQuaternion: vi.fn((target) => {
+		target.set(0, 0, -1, 0);
+		return target;
+	}),
+	clear: vi.fn(),
+	position: mockCameraPosition,
+} as unknown as Three.OrthographicCamera;
 
 const mockControls = {
 	addEventListener: vi.fn(),
@@ -70,12 +88,13 @@ const mockGUI = {
 } as unknown as GUI;
 
 describe('CameraWrapper', () => {
-	let cameraWrapper: CameraWrapper<OrbitControls>;
+	let cameraWrapper: CameraWrapper;
 
 	beforeEach(() => {
 		vi.clearAllMocks();
 		cameraWrapper = new CameraWrapper({
-			instance: mockCamera,
+			perspective: mockPerspectiveCamera,
+			orthographic: mockOrthographicCamera,
 			controls: mockControls,
 			Vector3: mockVector3Class,
 			Quaternion: mockQuaternionClass,
@@ -85,7 +104,7 @@ describe('CameraWrapper', () => {
 	describe('constructor', () => {
 		it('should create an instance with camera', () => {
 			expect(cameraWrapper).toBeInstanceOf(CameraWrapper);
-			expect(cameraWrapper.instance).toBe(mockCamera);
+			expect(cameraWrapper.instance).toBe(mockPerspectiveCamera);
 		});
 
 		it('should create uniforms with direction vector', () => {
@@ -93,15 +112,6 @@ describe('CameraWrapper', () => {
 			expect(cameraWrapper.uniforms.cameraDirection).toBeDefined();
 			expect(cameraWrapper.uniforms.cameraDirection.value).toBe(mockVector3);
 			expect(Object.isFrozen(cameraWrapper.uniforms)).toBe(true);
-		});
-
-		it('should work without controls', () => {
-			const wrapperWithoutControls = new CameraWrapper({
-				instance: mockCamera,
-				Vector3: mockVector3Class,
-				Quaternion: mockQuaternionClass,
-			});
-			expect(() => wrapperWithoutControls.controls).toThrowError();
 		});
 	});
 
@@ -113,21 +123,21 @@ describe('CameraWrapper', () => {
 
 			cameraWrapper.resize({ width, height });
 
-			expect(mockCamera.aspect).toBe(expectedAspect);
-			expect(mockCamera.updateProjectionMatrix).toHaveBeenCalled();
+			expect(mockPerspectiveCamera.aspect).toBe(expectedAspect);
+			expect(mockPerspectiveCamera.updateProjectionMatrix).toHaveBeenCalled();
 		});
 
 		it('should handle different aspect ratios', () => {
 			cameraWrapper.resize({ width: 800, height: 600 });
-			expect(mockCamera.aspect).toBeCloseTo(1.333, 2);
+			expect(mockPerspectiveCamera.aspect).toBeCloseTo(1.333, 2);
 
 			cameraWrapper.resize({ width: 1920, height: 1080 });
-			expect(mockCamera.aspect).toBeCloseTo(1.777, 2);
+			expect(mockPerspectiveCamera.aspect).toBeCloseTo(1.777, 2);
 		});
 
 		it('should always call updateProjectionMatrix', () => {
 			cameraWrapper.resize({ width: 100, height: 100 });
-			expect(mockCamera.updateProjectionMatrix).toHaveBeenCalled();
+			expect(mockPerspectiveCamera.updateProjectionMatrix).toHaveBeenCalled();
 		});
 	});
 
@@ -137,7 +147,7 @@ describe('CameraWrapper', () => {
 
 			cameraWrapper.update({ deltaTime });
 
-			expect(mockCamera.getWorldDirection).toHaveBeenCalledWith(
+			expect(mockPerspectiveCamera.getWorldDirection).toHaveBeenCalledWith(
 				cameraWrapper.uniforms.cameraDirection.value,
 			);
 		});
@@ -149,22 +159,12 @@ describe('CameraWrapper', () => {
 
 			expect(mockControls.update).toHaveBeenCalledWith(deltaTime);
 		});
-
-		it('should work without controls', () => {
-			const wrapperWithoutControls = new CameraWrapper({
-				instance: mockCamera,
-				Vector3: mockVector3Class,
-				Quaternion: mockQuaternionClass,
-			});
-
-			expect(() => wrapperWithoutControls.update({ deltaTime: 16 })).not.toThrow();
-		});
 	});
 
 	describe('clear method', () => {
 		it('should clear camera', () => {
 			cameraWrapper.clear();
-			expect(mockCamera.clear).toHaveBeenCalled();
+			expect(mockPerspectiveCamera.clear).toHaveBeenCalled();
 		});
 
 		it('should disconnect and dispose controls if available', () => {
@@ -172,16 +172,6 @@ describe('CameraWrapper', () => {
 
 			expect(mockControls.disconnect).toHaveBeenCalled();
 			expect(mockControls.dispose).toHaveBeenCalled();
-		});
-
-		it('should work without controls', () => {
-			const wrapperWithoutControls = new CameraWrapper({
-				instance: mockCamera,
-				Vector3: mockVector3Class,
-				Quaternion: mockQuaternionClass,
-			});
-
-			expect(() => wrapperWithoutControls.clear()).not.toThrow();
 		});
 	});
 
@@ -199,21 +189,11 @@ describe('CameraWrapper', () => {
 			expect(mockGUI.add).toHaveBeenCalledWith(mockCameraPosition, 'y');
 			expect(mockGUI.add).toHaveBeenCalledWith(mockCameraPosition, 'z');
 		});
-
-		it('should work without controls', () => {
-			const wrapperWithoutControls = new CameraWrapper({
-				instance: mockCamera,
-				Vector3: mockVector3Class,
-				Quaternion: mockQuaternionClass,
-			});
-
-			expect(() => wrapperWithoutControls.debug(mockGUI)).not.toThrow();
-		});
 	});
 
 	describe('properties', () => {
 		it('should expose camera instance', () => {
-			expect(cameraWrapper.instance).toBe(mockCamera);
+			expect(cameraWrapper.instance).toBe(mockPerspectiveCamera);
 		});
 
 		it('should expose controls', () => {

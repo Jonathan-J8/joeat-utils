@@ -70,7 +70,7 @@ myEmitter.clear();
 ```
 
 ```typescript
-import { Animator, RendererWrapper, PointerTracker } from 'joeat-utils';
+import { Animator, RendererWrapper, PointerTracker } from '../../src';
 import * as THREE from 'three';
 
 // Create renderer with post-processing support

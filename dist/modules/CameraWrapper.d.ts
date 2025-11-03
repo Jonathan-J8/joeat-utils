@@ -12,19 +12,23 @@ type Uniforms = {
         value: Three.Quaternion;
     };
 };
-type Controls = OrbitControls | FlyControls | ArcballControls | DragControls;
-export default class CameraWrapper<T extends Controls> {
+export default class CameraWrapper {
     #private;
     uniforms: Uniforms;
     direction: Three.Vector3 | undefined;
-    instance: Three.PerspectiveCamera | Three.OrthographicCamera;
-    constructor({ instance, controls, Vector3, Quaternion, }: {
-        instance: Three.PerspectiveCamera | Three.OrthographicCamera;
-        controls?: T;
+    perspective: Three.PerspectiveCamera;
+    orthographic: Three.OrthographicCamera;
+    controls: OrbitControls | FlyControls | ArcballControls | DragControls;
+    constructor({ perspective, orthographic, controls, Vector3, Quaternion, }: {
+        perspective: Three.PerspectiveCamera;
+        orthographic: Three.OrthographicCamera;
+        default?: 'perspective' | 'orthographic';
+        controls: OrbitControls | FlyControls | ArcballControls | DragControls;
         Vector3: typeof Three.Vector3;
         Quaternion: typeof Three.Quaternion;
     });
-    get controls(): T;
+    set instance(value: 'OrthographicCamera' | 'PerspectiveCamera');
+    get instance(): Three.PerspectiveCamera | Three.OrthographicCamera;
     resize: ({ width, height }: {
         width: number;
         height: number;

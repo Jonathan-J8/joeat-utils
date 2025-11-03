@@ -15,6 +15,6 @@
   "module": "index.es.js",
   "name": "joeat-utils",
   "type": "module",
-  "version": "1.0.3",
+  "version": "1.2.0",
   "private": false
 }

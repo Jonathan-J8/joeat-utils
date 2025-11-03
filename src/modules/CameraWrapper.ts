@@ -13,22 +13,27 @@ type Uniforms = {
 	cameraQuaternion: { value: Three.Quaternion };
 };
 
-type Controls = OrbitControls | FlyControls | ArcballControls | DragControls;
-
-export default class CameraWrapper<T extends Controls> {
+export default class CameraWrapper {
 	uniforms: Uniforms;
 	direction: Three.Vector3 | undefined;
-	instance: Three.PerspectiveCamera | Three.OrthographicCamera;
-	#controls: T | undefined;
+	#instance: Three.PerspectiveCamera | Three.OrthographicCamera;
+	perspective: Three.PerspectiveCamera;
+	orthographic: Three.OrthographicCamera;
+	controls: OrbitControls | FlyControls | ArcballControls | DragControls;
+	// dispatcher = new MonoEventEmitter();
 
 	constructor({
-		instance,
+		perspective,
+		orthographic,
 		controls,
 		Vector3,
 		Quaternion,
 	}: {
-		instance: Three.PerspectiveCamera | Three.OrthographicCamera;
-		controls?: T;
+		perspective: Three.PerspectiveCamera;
+		orthographic: Three.OrthographicCamera;
+		default?: 'perspective' | 'orthographic';
+		controls: OrbitControls | FlyControls | ArcballControls | DragControls;
+
 		Vector3: typeof Three.Vector3;
 		Quaternion: typeof Three.Quaternion;
 	}) {
@@ -37,31 +42,48 @@ export default class CameraWrapper<T extends Controls> {
 			cameraScale: { value: new Vector3() },
 			cameraQuaternion: { value: new Quaternion() },
 		});
-		this.instance = instance;
-		if (controls) this.#controls = controls;
-		// if (!this.controls) return;
-		// this.controls.addEventListener('change', () => {
-		// 	const { uDirection } = this.uniforms;
-		// 	this.instance.getWorldDirection(uDirection.value);
-		// });
+		this.controls = controls;
+		this.perspective = perspective;
+		this.orthographic = orthographic;
+		this.#instance = this.perspective;
 	}
 
-	get controls(): T {
-		if (!this.#controls) throw new Error('Controls not initialized');
-		return this.#controls;
+	set instance(value: 'OrthographicCamera' | 'PerspectiveCamera') {
+		if (value === 'OrthographicCamera' && this.#instance.type !== 'OrthographicCamera') {
+			this.#instance = this.orthographic;
+			this.controls.object = this.#instance;
+			// this.dispatcher.fire();
+			return;
+		}
+		if (this.#instance.type !== 'PerspectiveCamera') {
+			this.#instance = this.perspective;
+			this.controls.object = this.#instance;
+			// this.dispatcher.fire();
+		}
+
+		if (value !== 'OrthographicCamera' && value !== 'PerspectiveCamera') {
+			console.warn(
+				'Invalid camera type: use "OrthographicCamera" or "PerspectiveCamera". Falling back to "PerspectiveCamera"',
+			);
+		}
 	}
+
+	get instance(): Three.PerspectiveCamera | Three.OrthographicCamera {
+		return this.#instance;
+	}
+
+	// onInstanceChange = (...cb: (() => void)[]) => {
+	// 	this.dispatcher.addListener(...cb);
+	// };
 
 	resize = ({ width, height }: { width: number; height: number }) => {
-		const { instance } = this;
-		if ((instance as Three.PerspectiveCamera)?.aspect)
-			(instance as Three.PerspectiveCamera).aspect = width / height;
+		this.perspective.aspect = width / height;
+		this.perspective.updateProjectionMatrix();
 
-		// if(instance instanceof Three.OrthographicCamera) {
-		// 	const frustumHeight = instance.top - instance.bottom;
-		// 	instance.left = (frustumHeight * width) / height / -2;
-		// 	instance.right = (frustumHeight * width) / height / 2;
-		// }
-		this.instance.updateProjectionMatrix();
+		const frustumHeight = this.orthographic.top - this.orthographic.bottom;
+		this.orthographic.left = (frustumHeight * width) / height / -2;
+		this.orthographic.right = (frustumHeight * width) / height / 2;
+		this.orthographic.updateProjectionMatrix();
 	};
 
 	update = ({ deltaTime }: { deltaTime: number }) => {
@@ -69,33 +91,55 @@ export default class CameraWrapper<T extends Controls> {
 		this.instance.getWorldScale(this.uniforms.cameraScale.value);
 		this.instance.getWorldQuaternion(this.uniforms.cameraQuaternion.value);
 		// this.instance.getWorldPosition(this.uniforms.cameraPosition.value); // usually not needed
-		if (this.#controls && this.#controls.enabled) this.#controls.update(deltaTime);
+		if (this.controls && this.controls.enabled) this.controls.update(deltaTime);
 	};
 
 	clear = () => {
+		// this.dispatcher.clear();
+		this.perspective.clear();
+		this.orthographic.clear();
 		this.instance.clear();
-
-		if (!this.#controls) return;
-		this.#controls.disconnect();
-		this.#controls.dispose();
+		this.controls.disconnect();
+		this.controls.dispose();
 	};
 
 	debug = (gui: GUI) => {
-		if (this.#controls)
+		// CONTROLS
+		gui
+			.add({ enabled: this.controls.enabled }, 'enabled')
+			.name('controls enabled')
+			.onChange((v) => {
+				this.controls.enabled = v;
+			});
+
+		if ('enableDamping' in this.controls)
 			gui
-				.add({ enabled: this.#controls.enabled }, 'enabled')
-				.name('camera controls')
+				.add({ enableDamping: this.controls.enableDamping }, 'enableDamping')
+				.name('controls damping')
 				.onChange((v) => {
-					if (!this.#controls) return;
-					this.#controls.enabled = v;
+					if ('enableDamping' in this.controls) this.controls.enableDamping = v;
 				});
 
-		const { instance } = this;
+		if ('dampingFactor' in this.controls)
+			gui
+				.add({ dampingFactor: this.controls.dampingFactor }, 'dampingFactor', 0, 1, 0.01)
+				.name('controls damping factor')
+				.onChange((v) => {
+					if ('dampingFactor' in this.controls) this.controls.dampingFactor = v;
+				});
 
-		gui.add(instance.position, 'x').name('camera position x').listen();
-		gui.add(instance.position, 'y').name('camera position y').listen();
-		gui.add(instance.position, 'z').name('camera position z').listen();
-
+		// CAMERA TYPE
+		gui
+			.add({ orthographic: this.#instance.type === 'OrthographicCamera' }, 'orthographic')
+			.name('orthographic camera')
+			.onChange((v) => {
+				this.instance = v ? 'OrthographicCamera' : 'PerspectiveCamera';
+			});
+		//  CAMERA POSITION
+		gui.add(this.#instance.position, 'x').name('camera position x').listen();
+		gui.add(this.#instance.position, 'y').name('camera position y').listen();
+		gui.add(this.#instance.position, 'z').name('camera position z').listen();
+		//  CAMERA DIRECTION
 		gui.add(this.uniforms.cameraDirection.value, 'x').name('camera direction x').disable().listen();
 		gui.add(this.uniforms.cameraDirection.value, 'y').name('camera direction y').disable().listen();
 		gui.add(this.uniforms.cameraDirection.value, 'z').name('camera direction z').disable().listen();

@@ -1,7 +1,7 @@
-import { Animator } from 'joeat-utils';
 import type { WebGLRenderer } from 'three';
 import type { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { Animator } from '../../src';
 
 // Mock Three.js WebGLRenderer
 const mockRenderer = {

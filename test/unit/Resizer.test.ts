@@ -1,6 +1,6 @@
-import { Resizer } from 'joeat-utils';
 import { JSDOM } from 'jsdom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { Resizer } from '../../src';
 
 // Setup JSDOM for ResizeObserver
 const dom = new JSDOM('<!DOCTYPE html><html><body><div id="test-element"></div></body></html>', {

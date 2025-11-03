@@ -1,3 +1,7 @@
+# npm version patch
+# npm version minor
+# npm version major
+
 echo "HUSKY ⚙️ Running build before staging..." \
 && npm run build \
 && git add dist \

@@ -1,6 +1,6 @@
-import { PointerTracker } from 'joeat-utils';
 import type * as Three from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { PointerTracker } from '../../src';
 
 describe('PointerTracker', () => {
 	// Mock Three.js classes

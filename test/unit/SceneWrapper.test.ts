@@ -1,6 +1,6 @@
-import { SceneWrapper } from 'joeat-utils';
 import type * as Three from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { SceneWrapper } from '../../src';
 
 // Mock Three.js Scene and related objects
 const mockMaterial = {

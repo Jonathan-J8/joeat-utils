@@ -1,5 +1,5 @@
-import { TaskQueue } from 'joeat-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { TaskQueue } from '../../src';
 
 // Helper to create async task with delay
 const createAsyncTask = (delay: number, result?: string) => {
