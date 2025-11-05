@@ -1,0 +1,1 @@
+{"version":3,"file":"SceneWrapper.d.ts","sourceRoot":"","sources":["../../src/modules/SceneWrapper.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,KAAK,KAAK,MAAM,OAAO,CAAC;AAGpC,MAAM,CAAC,OAAO,OAAO,WAAW;IAC/B,QAAQ,EAAE,KAAK,CAAC,KAAK,CAAC;gBAEV,EAAE,QAAQ,EAAE,EAAE;QAAE,QAAQ,EAAE,KAAK,CAAC,KAAK,CAAA;KAAE;IAInD,KAAK,aAGH;CACF"}
