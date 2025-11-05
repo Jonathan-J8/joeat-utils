@@ -26,7 +26,17 @@ const Se = (t) => {
   }, dispose: () => {
     e.geometry.dispose(), e.material.dispose();
   } };
-}, Ce = (t) => new t(new Uint8Array(1), 1, 1), Ee = (t) => -1 * Math.cos(t * (Math.PI / 2)) + 1, Ie = (t) => Math.sin(t * (Math.PI / 2)), Fe = (t) => -0.5 * (Math.cos(Math.PI * t) - 1), Oe = (t) => t * t, Le = (t) => t * (2 - t), De = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t, ke = (t) => t * t * t, We = (t) => {
+}, Ce = (t) => new t(new Uint8Array(1), 1, 1), ge = (t) => {
+  Object.values(t).forEach((e) => {
+    typeof (e == null ? void 0 : e.dispose) == "function" && e.dispose();
+  });
+}, ve = (t) => {
+  if (!t) return;
+  const e = t;
+  e != null && e.geometry && e.geometry.dispose(), e != null && e.material && (Array.isArray(e.material) ? e.material.forEach((i) => {
+    ge(i), i.dispose();
+  }) : (ge(e.material), e.material.dispose())), e.children.forEach((i) => ve(i));
+}, Ee = (t) => -1 * Math.cos(t * (Math.PI / 2)) + 1, Ie = (t) => Math.sin(t * (Math.PI / 2)), Fe = (t) => -0.5 * (Math.cos(Math.PI * t) - 1), Oe = (t) => t * t, Le = (t) => t * (2 - t), De = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t, ke = (t) => t * t * t, We = (t) => {
   const e = t - 1;
   return e * e * e + 1;
 }, Re = (t) => t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1, Qe = (t) => t * t * t * t, Ae = (t) => {
@@ -74,7 +84,7 @@ const Se = (t) => {
   if (t === 0 || t === 1) return t;
   const i = 1 - e, n = t * 2, r = n - 1, c = i / (2 * Math.PI) * Math.asin(1);
   return n < 1 ? -0.5 * (Math.pow(2, 10 * r) * Math.sin((r - c) * (2 * Math.PI) / i)) : Math.pow(2, -10 * r) * Math.sin((r - c) * (2 * Math.PI) / i) * 0.5 + 1;
-}, ve = (t) => {
+}, ye = (t) => {
   const e = t / 1;
   if (e < 0.36363636363636365)
     return 7.5625 * e * e;
@@ -88,7 +98,7 @@ const Se = (t) => {
     const i = e - 0.9545454545454546;
     return 7.5625 * i * i + 0.984375;
   }
-}, Me = (t) => 1 - ve(1 - t), tt = (t) => t < 0.5 ? Me(t * 2) * 0.5 : ve(t * 2 - 1) * 0.5 + 0.5, ae = (t, e, i) => Math.max(e, Math.min(i, t)), it = (t, e, i) => t >= e - i && t <= e + i, xe = (t, e, i) => (1 - i) * t + i * e, H = (t, e, i, n, r = 1e-4) => t <= e + r && t >= e - r ? t : xe(t, e, 1 - Math.exp(-i * n)), st = (t, e, i, n, r = 1e-4) => {
+}, Me = (t) => 1 - ye(1 - t), tt = (t) => t < 0.5 ? Me(t * 2) * 0.5 : ye(t * 2 - 1) * 0.5 + 0.5, ae = (t, e, i) => Math.max(e, Math.min(i, t)), it = (t, e, i) => t >= e - i && t <= e + i, xe = (t, e, i) => (1 - i) * t + i * e, H = (t, e, i, n, r = 1e-4) => t <= e + r && t >= e - r ? t : xe(t, e, 1 - Math.exp(-i * n)), st = (t, e, i, n, r = 1e-4) => {
   t.x = H(t.x, e.x, i, n, r), t.y = H(t.y, e.y, i, n, r), t.x = H(t.x, e.x, i, n, r), t.y = H(t.y, e.y, i, n, r), typeof t.z == "number" && typeof e.z == "number" && (t.z = H(
     t.z,
     e.z,
@@ -498,22 +508,11 @@ class ht extends se {
   }
 }
 E = new WeakMap(), L = new WeakMap(), D = new WeakMap(), ee = new WeakMap(), I = new WeakMap(), k = new WeakMap(), te = new WeakMap();
-const ge = (t) => {
-  Object.values(t).forEach((e) => {
-    typeof (e == null ? void 0 : e.dispose) == "function" && e.dispose();
-  });
-}, ye = (t) => {
-  if (!t) return;
-  const e = t;
-  e != null && e.geometry && e.geometry.dispose(), e != null && e.material && (Array.isArray(e.material) ? e.material.forEach((i) => {
-    ge(i), i.dispose();
-  }) : (ge(e.material), e.material.dispose())), e.children.forEach((i) => ye(i));
-};
 class ut {
   constructor({ instance: e }) {
     a(this, "instance");
     a(this, "clear", () => {
-      ye(this.instance), this.instance.clear();
+      ve(this.instance), this.instance.clear();
     });
     this.instance = e;
   }
@@ -610,6 +609,7 @@ export {
   Ce as createEmpytTexture,
   H as dampThreshold,
   st as dampThresholdVec,
+  ve as disposeNode,
   Ge as easeInBack,
   Me as easeInBounce,
   Xe as easeInCirc,
@@ -631,7 +631,7 @@ export {
   je as easeInQuint,
   Ee as easeInSine,
   Ue as easeOutBack,
-  ve as easeOutBounce,
+  ye as easeOutBounce,
   Ye as easeOutCirc,
   We as easeOutCubic,
   Ze as easeOutElastic,

@@ -1,6 +1,7 @@
 export { default as clickout } from './clickout';
 export { default as createDebugTexture } from './createDebugTexture';
 export { default as createEmpytTexture } from './createEmpytTexture';
+export { default as disposeNode } from './disposeNode';
 export {
 	easeInBack,
 	easeInBounce,

@@ -1,5 +1,5 @@
 import type * as Three from 'three';
-import disposeNode from '../utils/disposeNode';
+import { disposeNode } from '../utils/';
 
 export default class CustomScene {
 	instance: Three.Scene;
