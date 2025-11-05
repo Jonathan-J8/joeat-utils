@@ -26,7 +26,7 @@ const ze = (i) => {
   }, dispose: () => {
     e.geometry.dispose(), e.material.dispose();
   } };
-}, Ee = (i) => new i(new Uint8Array(1), 1, 1), Ce = (i) => -1 * Math.cos(i * (Math.PI / 2)) + 1, Ie = (i) => Math.sin(i * (Math.PI / 2)), Fe = (i) => -0.5 * (Math.cos(Math.PI * i) - 1), Oe = (i) => i * i, Le = (i) => i * (2 - i), De = (i) => i < 0.5 ? 2 * i * i : -1 + (4 - 2 * i) * i, We = (i) => i * i * i, ke = (i) => {
+}, Ee = (i) => new i(new Uint8Array(1), 1, 1), Ce = (i) => -1 * Math.cos(i * (Math.PI / 2)) + 1, Ie = (i) => Math.sin(i * (Math.PI / 2)), Fe = (i) => -0.5 * (Math.cos(Math.PI * i) - 1), Oe = (i) => i * i, Le = (i) => i * (2 - i), De = (i) => i < 0.5 ? 2 * i * i : -1 + (4 - 2 * i) * i, ke = (i) => i * i * i, We = (i) => {
   const e = i - 1;
   return e * e * e + 1;
 }, Re = (i) => i < 0.5 ? 4 * i * i * i : (i - 1) * (2 * i - 2) * (2 * i - 2) + 1, Qe = (i) => i * i * i * i, Ae = (i) => {
@@ -431,20 +431,20 @@ class ct {
     }), this.instance = e, this.instance.debug.checkShaderErrors = !1, n && (this.composer = new n(this.instance));
   }
 }
-var C, D, W, te, I, k, ie;
+var C, D, k, te, I, W, ie;
 class ht extends ne {
   constructor(t) {
     super();
     h(this, C, 7680);
     // 4k
     h(this, D, 1280);
-    h(this, W, 720);
+    h(this, k, 720);
     h(this, te, 1);
     h(this, I, 1);
-    h(this, k);
+    h(this, W);
     a(this, "fire", () => {
-      let t = s(this, D), n = s(this, W);
-      if (s(this, D) > s(this, C) || s(this, W) > s(this, C))
+      let t = s(this, D), n = s(this, k);
+      if (s(this, D) > s(this, C) || s(this, k) > s(this, C))
         if (t > n) {
           const c = n / t;
           t = ce(t, 0, s(this, C)), n = t * c;
@@ -458,7 +458,7 @@ class ht extends ne {
     });
     h(this, ie, new ResizeObserver((t) => {
       const n = t[0].contentBoxSize[0], { inlineSize: r, blockSize: c } = n;
-      s(this, D) === r && s(this, W) === c || (o(this, D, r), o(this, W, c), this.fire());
+      s(this, D) === r && s(this, k) === c || (o(this, D, r), o(this, k, c), this.fire());
     }));
     a(this, "debug", (t) => {
       t.add({ maxSize: this.maxSize }, "maxSize", 0, 7680).name("max resolution").onChange((n) => {
@@ -467,16 +467,16 @@ class ht extends ne {
         this.resolutionFactor = n;
       });
     });
-    o(this, te, Math.min(window.devicePixelRatio, 2)), o(this, k, t), s(this, ie).observe(s(this, k)), this.fire();
+    o(this, te, Math.min(window.devicePixelRatio, 2)), o(this, W, t), s(this, ie).observe(s(this, W)), this.fire();
   }
   get width() {
     return s(this, D) * s(this, I);
   }
   get height() {
-    return s(this, W) * s(this, I);
+    return s(this, k) * s(this, I);
   }
   get element() {
-    return s(this, k);
+    return s(this, W);
   }
   get pixelRatio() {
     return s(this, te);
@@ -494,10 +494,10 @@ class ht extends ne {
     o(this, C, t < 32 ? 32 : t), this.fire();
   }
   clear() {
-    super.clear(), s(this, k) && s(this, ie).unobserve(s(this, k)), s(this, ie).disconnect();
+    super.clear(), s(this, W) && s(this, ie).unobserve(s(this, W)), s(this, ie).disconnect();
   }
 }
-C = new WeakMap(), D = new WeakMap(), W = new WeakMap(), te = new WeakMap(), I = new WeakMap(), k = new WeakMap(), ie = new WeakMap();
+C = new WeakMap(), D = new WeakMap(), k = new WeakMap(), te = new WeakMap(), I = new WeakMap(), W = new WeakMap(), ie = new WeakMap();
 const L = class L {
   constructor({ instance: e }) {
     a(this, "instance");
@@ -614,7 +614,7 @@ export {
   Ue as easeInBack,
   we as easeInBounce,
   Xe as easeInCirc,
-  We as easeInCubic,
+  ke as easeInCubic,
   Ze as easeInElastic,
   qe as easeInExpo,
   Ke as easeInOutBack,
@@ -634,7 +634,7 @@ export {
   Je as easeOutBack,
   ye as easeOutBounce,
   Ye as easeOutCirc,
-  ke as easeOutCubic,
+  We as easeOutCubic,
   _e as easeOutElastic,
   He as easeOutExpo,
   Le as easeOutQuad,

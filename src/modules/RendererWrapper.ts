@@ -1,5 +1,4 @@
 import type * as Three from 'three';
-import type { WebGPURenderer } from 'three/webgpu';
 
 import type { Pass } from 'three/addons/postprocessing/Pass.js';
 import type { EffectComposer as TEffectComposer } from 'three/examples/jsm/Addons.js';
@@ -10,9 +9,9 @@ type Uniforms = {
 	uResolution: { value: Three.Vector2 };
 };
 
-export default class GlRendererWrapper {
+export default class RendererWrapper {
 	uniforms: Uniforms;
-	instance: Three.WebGLRenderer | WebGPURenderer;
+	instance: Three.WebGLRenderer;
 	composer: TEffectComposer | undefined;
 
 	constructor({
