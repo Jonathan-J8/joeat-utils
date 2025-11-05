@@ -1,4 +1,5 @@
 import { WebGLRenderer } from 'three';
+import { WebGPURenderer } from 'three/webgpu';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { default as MonoEventEmitter } from './MonoEventEmitter';
 type InterpolateCallback = (it: {
@@ -26,8 +27,8 @@ declare class Animator extends MonoEventEmitter<[{
     }>;
     constructor();
     get paused(): boolean;
-    play: (renderer?: WebGLRenderer) => void;
-    pause: (renderer?: WebGLRenderer) => void;
+    play: (renderer?: WebGLRenderer | WebGPURenderer) => void;
+    pause: (renderer?: WebGLRenderer | WebGPURenderer) => void;
     debug: (gui: GUI) => void;
     interpolate: ({ from, to, onStart, onUpdate, onComplete, }: {
         from: number;

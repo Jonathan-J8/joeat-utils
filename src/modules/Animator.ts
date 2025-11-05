@@ -1,4 +1,6 @@
 import type { WebGLRenderer } from 'three';
+import type { WebGPURenderer } from 'three/webgpu';
+
 import type { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { clamp, now } from '../utils';
 import MonoEventEmitter from './MonoEventEmitter';
@@ -16,7 +18,7 @@ class Animator extends MonoEventEmitter<[{ time: number; deltaTime: number; delt
 	#rafID: undefined | number;
 	#paused = true;
 	#previousTime = 0;
-	#renderer: WebGLRenderer | undefined;
+	#renderer: WebGLRenderer | WebGPURenderer | undefined;
 
 	uniforms = Object.freeze({
 		uTime: { value: 0 },
@@ -45,7 +47,7 @@ class Animator extends MonoEventEmitter<[{ time: number; deltaTime: number; delt
 		this.#rafID = requestAnimationFrame(this.#tick);
 	};
 
-	play = (renderer?: WebGLRenderer) => {
+	play = (renderer?: WebGLRenderer | WebGPURenderer) => {
 		this.#renderer = renderer;
 		if (!this.#paused) return;
 		this.#paused = false;
@@ -55,7 +57,7 @@ class Animator extends MonoEventEmitter<[{ time: number; deltaTime: number; delt
 		else this.#rafID = requestAnimationFrame(this.#tick);
 	};
 
-	pause = (renderer?: WebGLRenderer) => {
+	pause = (renderer?: WebGLRenderer | WebGPURenderer) => {
 		this.#paused = true;
 
 		if (renderer) renderer.setAnimationLoop(null);
