@@ -1,4 +1,6 @@
 import type * as Three from 'three';
+import type { WebGPURenderer } from 'three/webgpu';
+
 import type { Pass } from 'three/addons/postprocessing/Pass.js';
 import type { EffectComposer as TEffectComposer } from 'three/examples/jsm/Addons.js';
 import type { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -10,7 +12,7 @@ type Uniforms = {
 
 export default class GlRendererWrapper {
 	uniforms: Uniforms;
-	instance: Three.WebGLRenderer;
+	instance: Three.WebGLRenderer | WebGPURenderer;
 	composer: TEffectComposer | undefined;
 
 	constructor({
